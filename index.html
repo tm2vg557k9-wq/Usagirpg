@@ -169,7 +169,14 @@ function save(show){if(chapter){s.chapterPositions=s.chapterPositions||{};s.chap
 }function judge(q,a){let attempt=logAnswer(q,a);let correct=a===q.a,first=correct&&!s.cleared.includes(q.id);if(first){s.cleared.push(q.id);award(30)}else if(correct){rewardOnce("repeat-"+q.id,5)}panel(correct?'✨ 正解！':'もう一度考えよう',q.why+(first?' ＋30 EXP！':''));if(!correct)reasonButtons(q,attempt);btn('問題を見直す',()=>quiz(q));btn('探索へ',home);if([2,6,8,17].every(id=>s.cleared.includes(id))&&[2,6,8,17].includes(q.id)){let p=document.createElement('p');p.textContent='🏆 代理の謎クリア！';$('panel').append(p)}render();save(false)}
 const words=[
 ['法律用語','追認','あとから正式に認める','事後承認','本人が契約をあとから認める。','無権代理では原則として契約時にさかのぼる。'],['法律用語','善意','問題となる事情を知らない','その事情を認識していない','代理権がないと知らない。','親切という意味ではない。'],['法律用語','悪意','問題となる事情を知っている','その事情を認識している','代理権がないと知っている。','悪人という意味ではない。'],['法律用語','過失','必要な注意を怠ること','注意義務違反','確認すべきことを確認しなかった。','善意と無過失は別。'],['法律用語','帰属する','権利・義務や効果がその人のものになる','効力が生じる、効果が及ぶ','契約の効果が本人に帰属する。','誰に効果が生じるか確認。'],['法律用語','対抗する','相手に権利などを法律上主張する','権利を主張する','土地の所有権を第三者に対抗する。','対抗不能と契約無効は別。'],['法律用語','催告','一定の行為や返答を求める','履行を求める、確答を求める','本人に追認するか返事を求める。','民法114条では相当の期間を定める。'],['法律用語','援用','制度の効果を受けるために主張する','時効を援用する','時効の利益を受けると主張する。','単なる引用とは異なる。'],['硬い表現','余地はない','その可能性はない','認められない、できない','拒絶する余地はない。','否定の対象を読む。'],['硬い表現','妨げない','それを禁止しない','差し支えない','請求することを妨げない。','別の要件が必要な場合もある。'],['硬い表現','にかかわらず','その条件がどうであっても','を問わず、の有無を問わず','善意悪意にかかわらず催告できる。','何を問わないか確認。'],['硬い表現','否か','そうであるかどうか','かどうか','追認するか否か。','否定だけを意味しない。'],['硬い表現','旨','という内容','という趣旨','追認する旨を伝える。','内容を表す。'],['硬い表現','当該','いま問題にしているその','その、該当する','当該契約。','何を指すか確認。'],['硬い表現','確答','はっきりした返事','明確な回答','追認するか確答する。','単なる返事と区別。'],['硬い表現','当然に','法律上、特別な手続などなく','法律上当然に','当然に効力が生じる。','日常語の当たり前とは違う場合がある。'],['硬い表現','別段の定め','通常と異なる取り決め','特別の定め','別段の定めがある場合。','例外条件に注意。'],['硬い表現','限り','その条件が続く間・その範囲内','場合に限る、ない限り','追認しない限り効力は生じない。','否定と組み合わせて読む。'],['混同注意','みなす／推定する','法律上そう扱う／反証がなければそう扱う','擬制／推定','拒絶したものとみなす。','原則として推定は反証可能、みなすは反証で覆せない。'],['混同注意','直ちに／遅滞なく','すぐに／正当な理由なく遅れないように','即時／不当な遅れなく','遅滞なく通知する。','同じ期限を意味しない。'],['混同注意','取消し／解除','取消原因のある行為を取り消す／契約を解消する','取消権／解除権','錯誤による取消し、債務不履行による解除。','要件と効果は制度ごとに確認。']];
-let dictionarySnapshot=null;function openDictionary(){if(dictionarySnapshot)return;dictionarySnapshot=Array.from($('panel').childNodes);dictionary(()=>{let nodes=dictionarySnapshot;dictionarySnapshot=null;if(nodes)$('panel').replaceChildren(...nodes);else home()});}function dictionary(back){panel('🔮 ことばの万華鏡','法律用語・硬い表現・混同注意');let input=document.createElement('input');input.placeholder='用語・やさしい意味・類似表現を検索';$('panel').append(input);let sel=document.createElement('select');['すべて','法律用語','硬い表現','混同注意'].forEach(v=>{let o=document.createElement('option');o.textContent=v;sel.append(o)});$('panel').append(sel);let list=document.createElement('div');$('panel').append(list);function update(){list.replaceChildren();words.filter(w=>(sel.value==='すべて'||w[0]===sel.value)&&w.join(' ').includes(input.value.trim())).forEach(w=>{let d=document.createElement('details'),sum=document.createElement('summary');sum.textContent=w[1]+'：'+w[2];d.append(sum);['類似表現：'+w[3],'例：'+w[4],'注意：'+w[5]].forEach(t=>{let p=document.createElement('p');p.textContent=t;d.append(p)});list.append(d)});if(!list.children.length)list.textContent='該当なし'}input.oninput=update;sel.onchange=update;update();btn('戻る',back||home)}
+let dictionarySnapshot=null;function openDictionary(){if(dictionarySnapshot)return;dictionarySnapshot=Array.from($('panel').childNodes);dictionary(()=>{let nodes=dictionarySnapshot;dictionarySnapshot=null;if(nodes)$('panel').replaceChildren(...nodes);else home()});}function dictionary(back){panel('🔮 ことばの万華鏡','法律用語・硬い表現・混同注意');let input=document.createElement('input');input.placeholder='用語・やさしい意味・類似表現を検索';$('panel').append(input);let sel=document.createElement('select');['すべて','法律用語','硬い表現','混同注意'].forEach(v=>{let o=document.createElement('option');o.textContent=v;sel.append(o)});$('panel').append(sel);let list=document.createElement('div');$('panel').append(list);function update(){list.replaceChildren();words.filter(w=>(sel.value==='すべて'||w[0]===sel.value)&&w.join(' ').includes(input.value.trim())).forEach(w=>{let d=document.createElement('details'),sum=document.createElement('summary');sum.textContent=w[1]+'：'+w[2];d.append(sum);['類似表現：'+w[3],'例：'+w[4],'注意：'+w[5]].forEach(t=>{let p=document.createElement('p');p.textContent=t;d.append(p)});list.append(d)});if(!list.children.length)list.textContent='該当なし'}input.oninput=update;sel.onchange=update;update();
+ // Keep the return action visible at the top even when the dictionary is long.
+ const root=$('panel'),heading=root.querySelector('h2');
+ const toolbar=document.createElement('div');toolbar.className='dictionary-toolbar';
+ root.insertBefore(toolbar,heading);toolbar.append(heading);
+ const goBack=btn('← 戻る',back||home,toolbar);goBack.classList.add('dictionary-back-top');
+ root.scrollTop=0;
+}
 function training(){let items=[['本人は、無権代理行為を追認することを拒絶できる。','主語は？',['本人','無権代理人','相手方'],0,'本人は拒絶できる。'],['本人が追認しない限り、効力は本人に帰属しない。','条件は？',['効力が生じる','本人が追認しない','本人に帰属する'],1,'追認しないことが条件。'],['追認を拒絶する余地はない。','結論は？',['拒絶できる','追認できない','拒絶できない'],2,'余地はない＝可能性はない。']];let i=0;function show(){let a=items[i];panel('🪶 読解修行 '+(i+1)+'/3',a[0]+' '+a[1]);let feedback=document.createElement('p');a[2].forEach((v,j)=>btn(v,()=>{feedback.textContent=(j===a[3]?'⭕ ':'もう一度：')+a[4];if(j===a[3]&&!feedback.dataset.done){feedback.dataset.done='1';btn(i===2?'修行終了':'次へ',()=>{i++;if(i===items.length)home();else show()})}}));$('panel').append(feedback)}show()}let recordTab='summary';
 function record(tab='summary'){
  recordTab=tab;
@@ -1672,4 +1679,46 @@ observer.observe(panel,{subtree:true,childList:true,characterData:true});paintPa
  #panel .quiz-answer-row button{font-size:16px!important;min-height:50px!important;padding:9px 5px!important}
  #panel .quiz-reading-row button{font-size:12px!important;padding:8px 2px!important}
 }
-</style></html>
+</style>
+<style id="v099Layout">
+/* Ver.0.9.9: a visible, sticky return button for the long glossary */
+#panel .dictionary-toolbar{position:sticky;top:0;z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-3px -3px 9px;padding:8px 8px;background:linear-gradient(110deg,#f7eafa,#efe0f8);border:1px solid #dabfe8;border-radius:14px;box-shadow:0 3px 9px #654c7a2b}
+#panel .dictionary-toolbar h2{margin:0!important;flex:1;min-width:0;font-size:clamp(17px,1.4vw,21px)!important}
+#panel .dictionary-toolbar .dictionary-back-top{flex:none;min-height:38px;min-width:92px;margin:0!important;padding:6px 13px!important;font-weight:750!important;background:linear-gradient(#fff5d9,#f7dcb0)!important;border-color:#d8b988!important;color:#61476e!important}
+/* Map guidance moves away from the direction buttons to the upper-right space. */
+.map-topbar{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px;min-height:37px;width:100%;margin:1px 0 5px;padding:0 3px}
+.map-topbar>.map-size{justify-content:flex-start;white-space:nowrap;margin:0 4px 0 0!important}
+.map-guide-box{min-width:0;max-width:100%;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:1px;text-align:right}
+.map-topbar #status{font-weight:700;font-size:clamp(10px,.86vw,12px)!important;color:#ffedb6!important;min-height:0!important;max-width:100%;padding:1px 4px;line-height:1.27;overflow-wrap:anywhere;text-align:right}
+.map-topbar #status:empty{display:none}
+.map-topbar .map-help{margin:0!important;color:#e3d2f0!important;font-size:clamp(9px,.72vw,11px)!important;line-height:1.25;white-space:normal;text-align:right;max-width:100%}
+@media(max-width:580px){
+ .map-topbar{grid-template-columns:1fr;gap:1px;min-height:0}
+ .map-topbar>.map-size{justify-content:center!important}
+ .map-guide-box{justify-self:stretch;align-items:center;text-align:center;gap:0}
+ .map-topbar #status,.map-topbar .map-help{text-align:center}
+ .map-topbar .map-help{font-size:10px!important}
+ #panel .dictionary-toolbar{top:0;padding:7px}
+ #panel .dictionary-toolbar h2{font-size:17px!important}
+}
+</style>
+<script>
+(()=>{
+ const mark=document.querySelector('.game-header span');if(mark)mark.textContent='Ver.0.9.9';
+ const side=document.getElementById('mapSide');
+ const mapSize=side?.querySelector('.map-size');
+ const status=document.getElementById('status');
+ const help=side?.querySelector('.map-help');
+ if(side&&mapSize&&status&&help){
+  const bar=document.createElement('div');bar.className='map-topbar';
+  side.insertBefore(bar,mapSize);
+  bar.appendChild(mapSize);
+  const guide=document.createElement('div');guide.className='map-guide-box';
+  bar.appendChild(guide);
+  guide.appendChild(status);
+  guide.appendChild(help);
+  help.textContent='住民の隣で「話す」｜木・川・建物には入れないよ';
+ }
+})();
+</script>
+</html>
