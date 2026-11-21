@@ -611,4 +611,204 @@ function toggleStudyMenu(){setStudyMenu($('studyMenu').hidden)}
 // When a conversation opens, reveal the study panel without losing its contents.
 const originalTalk=talk;talk=function(){if($('gameLayout').dataset.view==='map')setView('both');return originalTalk.apply(this,arguments)};
 setView('both');
-</script></html>
+</script>
+<script>
+(()=>{
+  // Ver.0.9.1 patch: pixel menu icons, improved rabbit gear layering, and facility-style NPC sprites.
+  const ver=document.querySelector('.game-header span'); if(ver) ver.textContent='Ver.0.9.1';
+  const title=document.querySelector('.game-header h1'); if(title) title.textContent='🐰 うさぎ村の法律冒険記';
+  const style=document.createElement('style');
+  style.textContent=`
+    .pixel-btn-wrap{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%}
+    .pixel-btn-wrap svg{width:18px;height:18px;image-rendering:pixelated;flex:0 0 auto}
+    .pixel-btn-label{line-height:1.15}
+    #studyMenu button .pixel-btn-wrap{justify-content:flex-start}
+    .chapter-back .pixel-btn-wrap,.menu-toggle .pixel-btn-wrap,.talk-slot .pixel-btn-wrap,.view-switch .pixel-btn-wrap{justify-content:center}
+    .talk-slot svg{width:20px;height:20px}
+  `;
+  document.head.append(style);
+
+  function makeIcon(label){
+    const r=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+    const wrap=b=>`<svg viewBox="0 0 32 32" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${b}</svg>`;
+    if(label.includes('辞典')) return wrap(r(5,6,21,19,'#764c95')+r(8,9,15,13,'#e7d9f6')+r(10,12,11,2,'#7f68a6')+r(10,16,9,2,'#7f68a6')+r(9,24,13,2,'#c1acd9'));
+    if(label.includes('民法条文')||label.includes('条文')) return wrap(r(4,7,11,18,'#497095')+r(17,7,11,18,'#6ba0c0')+r(6,10,7,10,'#f0f6f8')+r(19,10,7,10,'#f0f6f8')+r(15,7,2,18,'#cfd8d8'));
+    if(label.includes('読解')) return wrap(r(5,24,18,3,'#8a6a41')+r(20,6,3,18,'#8a6a41')+r(22,5,3,3,'#e8d4a0')+r(17,8,6,4,'#f5edc6')+r(12,12,9,2,'#f5edc6')+r(9,16,10,2,'#f5edc6'));
+    if(label.includes('学校')) return wrap(r(4,14,24,14,'#e4d8bf')+r(2,12,28,3,'#8f6565')+r(7,7,18,6,'#b27a7f')+r(12,19,8,9,'#8f6e50')+r(7,18,4,4,'#9cc2d0')+r(21,18,4,4,'#9cc2d0'));
+    if(label.includes('道場')) return wrap(r(3,22,26,4,'#85705c')+r(5,10,22,12,'#c8b38c')+r(3,8,26,3,'#8d5f46')+r(8,13,3,9,'#5f4d3b')+r(21,13,3,9,'#5f4d3b')+r(13,14,6,4,'#d95454'));
+    if(label.includes('ボス戦')) return wrap(r(7,11,18,13,'#d6b34f')+r(9,8,4,5,'#d6b34f')+r(19,8,4,5,'#d6b34f')+r(10,24,12,3,'#9f7b2d')+r(12,14,2,5,'#fff2b0')+r(18,14,2,5,'#fff2b0'));
+    if(label.includes('別表現')) return wrap(r(5,8,10,16,'#8db5c1')+r(17,8,10,16,'#d5b7e8')+r(10,13,12,6,'#fbf7ff')+r(11,14,10,4,'#e9df74'));
+    if(label.includes('弱点')) return wrap(r(6,5,18,22,'#a34747')+r(9,8,12,16,'#f5ece1')+r(11,12,8,2,'#b57878')+r(11,16,7,2,'#b57878')+r(11,20,6,2,'#b57878'));
+    if(label.includes('記録')) return wrap(r(5,7,22,18,'#7d9ab2')+r(8,10,16,12,'#f5f0df')+r(10,13,11,2,'#7690a5')+r(10,17,11,2,'#7690a5')+r(10,21,8,2,'#7690a5'));
+    if(label.includes('セーブ')) return wrap(r(5,6,22,20,'#7a6f77')+r(8,9,16,14,'#d9d6db')+r(10,11,12,5,'#8fb4c0')+r(11,19,10,3,'#92818b')+r(18,7,5,5,'#4b4150'));
+    if(label.includes('探索')) return wrap(r(6,20,20,4,'#5f8154')+r(12,8,8,12,'#cbbd7b')+r(17,6,9,9,'#9cc4d0')+r(21,11,5,2,'#6d8b94'));
+    if(label.includes('読書')) return wrap(r(4,8,11,16,'#6888a0')+r(17,8,11,16,'#9ab2c9')+r(6,10,7,10,'#f7f1e0')+r(19,10,7,10,'#f7f1e0')+r(15,8,2,16,'#cfd4d4'));
+    if(label.includes('通常')) return wrap(r(11,5,4,13,'#fffaf0')+r(18,4,4,14,'#fffaf0')+r(12,8,2,8,'#e1a8bc')+r(19,7,2,9,'#e1a8bc')+r(9,14,15,10,'#fffaf0')+r(10,24,5,4,'#6f6883')+r(18,24,5,4,'#6f6883'));
+    if(label.includes('学習メニュー')) return wrap(r(5,8,22,3,'#8ca587')+r(5,15,22,3,'#8ca587')+r(5,22,22,3,'#8ca587'));
+    if(label.includes('章選択')) return wrap(r(8,15,16,3,'#6d7f69')+r(8,15,5,5,'#6d7f69')+r(8,12,5,11,'#6d7f69'));
+    if(label.includes('話す')||label.includes('調べる')) return wrap(r(5,7,18,14,'#f3e5b8')+r(9,21,5,5,'#f3e5b8')+r(8,10,12,8,'#816d4e')+r(21,12,3,3,'#816d4e'));
+    return '';
+  }
+
+  function stripEmoji(text){ return text.replace(/^[^\p{L}\p{N}]+/u,'').trim(); }
+  function iconifyButton(btn,label){
+    if(!btn) return;
+    const txt=(label||btn.textContent||'').trim();
+    const clean=stripEmoji(txt);
+    const icon=makeIcon(clean||txt);
+    if(!icon) return;
+    btn.dataset.iconified='1';
+    btn.innerHTML=`<span class="pixel-btn-wrap">${icon}<span class="pixel-btn-label">${clean||txt}</span></span>`;
+    btn.setAttribute('aria-label',clean||txt);
+  }
+  window.iconifyButton=iconifyButton;
+
+  function decorateStaticUI(){
+    document.querySelectorAll('#studyMenu button').forEach(b=>iconifyButton(b));
+    document.querySelectorAll('.view-switch button').forEach(b=>iconifyButton(b));
+    iconifyButton(document.getElementById('menuToggle'));
+    const back=document.querySelector('.chapter-back'); if(back) iconifyButton(back);
+    const talk=document.getElementById('talkAction'); if(talk && !talk.hidden) iconifyButton(talk);
+  }
+  decorateStaticUI();
+
+  const originalBtn = window.btn;
+  window.btn = function(label,fn,where){
+    const b = originalBtn(label,fn,where);
+    iconifyButton(b,label);
+    return b;
+  };
+
+  window.setStudyMenu = function(open){
+    $('studyMenu').hidden=!open;
+    $('menuToggle').setAttribute('aria-expanded',String(open));
+    $('menuToggle').textContent=open?'▲ 学習メニューをしまう':'▼ 学習メニューを開く';
+    iconifyButton($('menuToggle'));
+    decorateStaticUI();
+  }
+
+  const c = rabbitC;
+  window.rabbitPixels = function(facing='down',step=0,outfit=''){
+    const r=(x,y,w,h,col)=>pixelRect(x,y,w,h,col);
+    const walk=(step%2===1)?1:0,back=facing==='up',side=facing==='left'||facing==='right';
+    let under='',body='',top='';
+    under+=r(7,29,19,2,'#5a755d')+r(10,30,15,1,'#7c9575');
+    const cape=outfit==='星降るマント';
+    const bag=outfit==='魔法のかばん';
+    const scarf=outfit==='冒険者のマフラー';
+    const wand=outfit==='法律魔法の杖';
+    const hat=outfit==='賢者の帽子';
+    const crown=outfit==='大賢者の冠';
+    if(cape){under+=r(6,16,21,12,'#3f365e')+r(5,19,4,9,'#695496')+r(24,19,4,9,'#695496')+r(7,26,19,2,'#ceab68')+r(9,22,2,2,c.gold)+r(22,24,2,2,c.gold);}    
+    body+=r(9,26+walk,6,3,c.edge)+r(10,26+walk,5,3,c.white);
+    body+=r(18,27-walk,6,3,c.edge)+r(19,27-walk,4,2,c.white);
+    if(side){
+      body+=r(7,18,18,9,c.edge)+r(8,18,16,8,c.purple)+r(9,19,12,2,c.purpleLight);
+      body+=r(6,21,4,5,c.white)+r(22,20,5,6,c.white);
+      body+=r(10,4,5,12,c.edge)+r(11,4,3,12,c.white)+r(12,6,1,7,c.pink);
+      body+=r(16,2,5,13,c.edge)+r(17,2,3,13,c.white)+r(18,4,1,8,c.pink);
+      body+=r(9,13,17,11,c.edge)+r(10,13,16,10,c.white)+r(25,17,3,4,c.light);
+      body+=r(20,17,2,3,c.eye)+r(21,18,1,1,'#faf2ed')+r(27,21,2,1,c.pinkDark);
+      body+=r(18,23,6,1,c.pinkDark)+r(17,21,2,1,c.pink);
+    }else{
+      body+=r(7,18,19,9,c.edge)+r(8,18,17,9,c.purple)+r(10,19,13,2,c.purpleLight);
+      body+=r(5,20,4,6,c.edge)+r(6,20,3,6,c.white)+r(24,20,4,6,c.edge)+r(24,20,3,6,c.white);
+      body+=r(10,3,6,14,c.edge)+r(11,3,4,14,c.white)+r(12,6,2,9,back?c.light:c.pink);
+      body+=r(19,2,6,15,c.edge)+r(20,2,4,15,c.white)+r(21,5,2,10,back?c.light:c.pink);
+      body+=r(8,13,18,11,c.edge)+r(9,13,16,10,back?c.light:c.white);
+      body+=r(7,16,2,5,c.shade)+r(25,16,2,5,c.shade);
+      if(!back){
+        body+=r(12,18,2,3,c.eye)+r(21,18,2,3,c.eye);
+        body+=r(12,18,1,1,'#faf2ed')+r(21,18,1,1,'#faf2ed');
+        body+=r(10,22,3,2,'#f5cad5')+r(22,22,3,2,'#f5cad5');
+        body+=r(16,22,2,2,c.pinkDark)+r(15,24,4,1,c.edge);
+      }else{
+        body+=r(12,16,12,2,c.shade)+r(13,22,10,2,c.purpleLight)
+      }
+    }
+    // Improved item positions: scarf sits lower on the neck, bag strap avoids the face.
+    if(bag){
+      if(back){
+        top+=r(10,21,12,8,c.darkBrown)+r(11,22,10,6,c.brown)+r(14,23,4,2,c.gold);
+      }else if(side){
+        top+=r(12,16,2,10,c.darkBrown)+r(12,17,2,2,c.brown)+r(20,21,6,7,c.darkBrown)+r(21,21,5,6,c.brown)+r(22,23,3,2,c.gold);
+      }else{
+        top+=r(8,16,2,10,c.darkBrown)+r(22,16,2,10,c.darkBrown)+r(20,21,6,7,c.darkBrown)+r(21,21,5,6,c.brown)+r(22,23,3,2,c.gold);
+      }
+    }
+    if(scarf){
+      if(side) top+=r(10,18,11,3,c.pinkDark)+r(11,18,9,2,'#ba607e')+r(16,20,4,6,'#ba607e')+r(16,24,3,1,c.gold);
+      else if(back) top+=r(10,18,14,3,c.pinkDark)+r(11,18,12,2,'#ba607e')+r(19,20,3,6,'#ba607e')+r(19,24,2,1,c.gold);
+      else top+=r(10,18,14,3,c.pinkDark)+r(11,18,12,2,'#ba607e')+r(19,20,3,6,'#ba607e')+r(19,24,2,1,c.gold);
+    }
+    if(wand){top+=r(27,13,2,14,c.brown)+r(26,14,1,2,c.gold)+r(27,12,2,2,c.gold)+r(29,14,2,2,c.gold)+r(28,10,2,3,'#e1c2fb')+r(25,12,2,2,'#e1c2fb')+r(28,16,2,2,'#e1c2fb')}
+    if(hat){top+=r(7,13,20,3,'#473958')+r(10,7,13,7,'#554773')+r(12,6,9,2,'#554773')+r(12,13,11,2,c.gold)+r(16,12,3,2,'#e5c67b')+r(19,7,2,3,'#ae92c5')}
+    if(crown){top+=r(8,15,18,3,'#d19b3c')+r(9,13,3,3,c.gold)+r(14,11,4,5,c.gold)+r(21,13,3,3,c.gold)+r(12,16,2,1,'#7baed6')+r(18,16,2,1,'#c86c9c')}
+    const content=under+body+top;
+    return pixelSVG(side&&facing==='left'?`<g transform="translate(32 0) scale(-1 1)">${content}</g>`:content);
+  }
+
+  function facilitySprite(kind){
+    const r=(x,y,w,h,c)=>pixelRect(x,y,w,h,c);
+    if(kind==='library') return pixelSVG(r(4,14,24,14,'#7f6f58')+r(6,16,20,12,'#efe4c9')+r(2,11,28,4,'#5a7e62')+r(6,6,20,6,'#709a79')+r(9,9,3,2,'#a34f6d')+r(13,9,3,2,'#5387b0')+r(17,9,3,2,'#d0b85f')+r(21,9,3,2,'#7e63a4')+r(12,20,8,8,'#8c6b48'));
+    if(kind==='bakery') return pixelSVG(r(4,14,24,14,'#8a6b54')+r(6,16,20,12,'#efe4c9')+r(2,11,28,4,'#b06d72')+r(7,7,18,5,'#d6938e')+r(11,18,8,10,'#8f6c4c')+r(20,18,4,4,'#9fc6d4')+r(11,8,10,3,'#e3bc57'));
+    if(kind==='mouse') return pixelSVG(r(6,15,20,13,'#806655')+r(8,17,16,11,'#dcc9b2')+r(4,12,24,4,'#6a9462')+r(12,19,6,9,'#7c5e45')+r(9,19,3,3,'#a7c8d5')+r(20,19,3,3,'#a7c8d5')+r(10,8,4,4,'#8f8d9f')+r(18,8,4,4,'#8f8d9f'));
+    if(kind==='school') return pixelSVG(r(4,13,24,15,'#8d725f')+r(6,15,20,13,'#e7decb')+r(2,11,28,3,'#7f5f62')+r(7,6,18,6,'#ad7f87')+r(11,19,8,9,'#8e6e50')+r(7,18,3,4,'#abc9d5')+r(22,18,3,4,'#abc9d5'));
+    return '';
+  }
+
+  function npcVisual(q){
+    if(!q) return '';
+    if(q.id===2 || /図書館/.test(q.name)) return facilitySprite('library');
+    if(/パン屋/.test(q.name)) return facilitySprite('bakery');
+    if(/ネズミ/.test(q.name)) return facilitySprite('mouse');
+    if(/先生/.test(q.name)) return facilitySprite('school');
+    if(q.icon && !/[\u2600-\u27BF\uD83C-\uDBFF\uDC00-\uDFFF]/.test(q.icon)) return q.icon;
+    return q.icon||sprite(q.id===6?'bear':q.id===8?'fox':'owl');
+  }
+
+  window.render = function(){
+    let choices=candidates();
+    if(!choices.some(q=>q.id===selectedNpc))selectedNpc=null;
+    if(choices.length===1)selectedNpc=choices[0].id;
+    const m=$('map');m.replaceChildren();
+    for(let y=0;y<11;y++) for(let x=0;x<15;x++){
+      let t=tile(x,y), q=activeQ().find(a=>a.x===x&&a.y===y), b=document.createElement('button');
+      b.className='tile '+({'#':'tree','~':'water','p':'path','f':'flower','H':'house','O':'fountain','B':'bridge'}[t]||'grass');
+      let player=x===s.x&&y===s.y;
+      b.setAttribute('aria-label',player?'うさぎ':q?q.name:`位置 ${x},${y}`);
+      if(player){
+        b.classList.add('player');
+        b.innerHTML=sprite('rabbit',s.facing||'down',s.walkFrame||0,s.equipped||'');
+      }else if(q){
+        b.innerHTML=npcVisual(q);
+        if(Math.abs(x-s.x)+Math.abs(y-s.y)<=1) b.classList.add('near-npc');
+        if(q.id===selectedNpc) b.classList.add('selected-npc');
+        if(s.cleared.includes(q.id)) b.style.boxShadow='inset 0 0 0 2px #e8d88a';
+      }else if(['#','~','f','H','O','B'].includes(t)) b.innerHTML=pixelScenery(t,x,y);
+      b.onclick=()=>{ if(q&&candidates().some(a=>a.id===q.id)) selectNpc(q.id); else if(player) talk(); else if(Math.abs(x-s.x)+Math.abs(y-s.y)===1) move(x-s.x,y-s.y); else $('status').textContent='隣のマスへ移動してね。'; };
+      m.append(b);
+    }
+    $('lv').textContent='Lv.'+levelNow()+' '+titleNow();
+    $('exp').textContent='⭐ '+s.exp+' EXP';
+    $('progress').textContent='📜 '+s.cleared.filter(id=>Q.some(q=>q.id===id)).length+'/'+Q.length;
+    let nearby=near();
+    $('talkAction').hidden=!choices.length;
+    $('talkAction').disabled=!nearby;
+    $('talkAction').textContent=nearby?nearby.name+(nearby.id===2?' を調べる':' と話す'):'相手を選択';
+    iconifyButton($('talkAction'));
+    let list=$('npcChoices'); list.replaceChildren();
+    if(choices.length>1) choices.forEach(q=>{
+      let b=document.createElement('button'); b.textContent=q.name; b.setAttribute('aria-pressed',String(q.id===selectedNpc)); b.onclick=()=>selectNpc(q.id); list.append(b);
+    });
+    decorateStaticUI();
+  };
+
+  // Ensure patched labels are applied now and after view changes.
+  const originalSetView = window.setView;
+  window.setView = function(v){ originalSetView(v); decorateStaticUI(); };
+  decorateStaticUI();
+  if(typeof render==='function') render();
+})();
+</script>
+</html>
