@@ -811,4 +811,206 @@ setView('both');
   if(typeof render==='function') render();
 })();
 </script>
+
+<script>
+(()=>{
+'use strict';
+// Ver.0.9.2: expandable gear, portrait avatar shortcut and pixel-faced villagers.
+const tag=document.querySelector('.game-header>span');if(tag)tag.textContent='Ver.0.9.2';
+// Preserve the player's old Lv5 scarf selection by migrating the name only.
+const scarfOld='冒険者のマフラー', brooch='冒険者のブローチ';
+if(s.equipped===scarfOld){s.equipped=brooch;save(false);}
+const additions=[
+ [5,'💠',brooch],[10,'🎒','魔法のかばん'],[15,'🪄','法律魔法の杖'],[20,'🎓','賢者の帽子'],
+ [25,'✨','銀の法律バッジ'],[30,'🧥','星降るマント'],[35,'👜','森のポーチ'],
+ [40,'🌙','月光のペンダント'],[45,'🎀','星の耳飾り'],[50,'👑','大賢者の冠'],
+ [60,'🛡️','勇気のエンブレム'],[75,'💎','蒼玉のペンダント'],[100,'🪽','伝説の羽飾り']
+];
+gear.splice(0,gear.length,...additions);
+titles.push([60,'法と星の探究者'],[75,'法の精霊の守護者'],[100,'うさぎ村の伝説の賢者']);
+const css=document.createElement('style');
+css.textContent=`
+.stats{display:inline-flex!important;width:max-content;max-width:100%;align-items:center!important;justify-content:flex-start!important;gap:9px!important;padding:4px 12px 4px 5px!important;margin:2px 0 4px;border:1px solid #698268;background:#3e5949!important;vertical-align:middle}
+.stats .status-avatar{width:52px;height:52px;min-width:52px;border:2px solid #91ad84;border-radius:9px;padding:2px;background:repeating-conic-gradient(#a1bd8a 0 25%,#acc596 0 50%) 50%/14px 14px;display:grid;place-items:center;position:relative}
+.stats .status-avatar::after{content:'↗';position:absolute;bottom:-3px;right:-4px;background:#eee2bf;color:#3c5944;font-size:11px;line-height:14px;border-radius:4px;min-width:14px;text-align:center}
+.stats .status-avatar svg{width:42px;height:42px;display:block;image-rendering:pixelated}
+.status-info{display:grid;grid-template-rows:auto auto;gap:2px;min-width:0}
+.status-info #lv{font-size:14px;font-weight:750;white-space:nowrap;line-height:1.3}
+.status-totals{display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:13px;color:#f6ecd6}
+@media(max-width:400px){.stats .status-avatar{width:46px;height:46px;min-width:46px}.stats .status-avatar svg{width:38px;height:38px}.status-totals{gap:7px;font-size:12px}.status-info #lv{font-size:13px}}
+.wardrobe-backdrop{position:fixed;inset:0;background:#0d1b15bd;z-index:200;display:grid;place-items:center;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.wardrobe-sheet{position:relative;background:#f6ecd6;color:#29382c;max-width:660px;width:100%;max-height:92dvh;overflow:auto;border-radius:17px;padding:16px;border:4px solid #9baf83;box-shadow:0 18px 65px #0007}
+.wardrobe-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.wardrobe-head h2{font-size:20px;margin:0}.wardrobe-close{min-height:42px;min-width:44px;background:#dacbac}
+.wardrobe-showcase{display:grid;grid-template-columns:130px minmax(0,1fr);align-items:center;gap:12px;background:#e5eacb;padding:11px;border-radius:12px;margin:12px 0}
+.wardrobe-figure{height:136px;width:124px;display:grid;place-items:center;background:repeating-conic-gradient(#9cb882 0 25%,#a8c38d 0 50%) 50%/26px 26px;border:4px solid #6b8064;border-radius:10px}
+.wardrobe-figure svg{height:116px;width:116px;image-rendering:pixelated}.wardrobe-summary strong,.wardrobe-summary small{display:block;margin:4px 0}.wardrobe-summary small{color:#515845}
+.wardrobe-directions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.wardrobe-directions button{min-height:34px;min-width:38px;background:#e7dabc;padding:5px}.wardrobe-directions button[aria-pressed=true]{background:#bdd3ad;outline:2px solid #61845a}
+.wardrobe-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.wardrobe-list button{text-align:left;min-height:51px;font-size:13px;padding:8px;border:2px solid transparent}.wardrobe-list button[aria-pressed=true]{border-color:#729961;background:#c7dab9}.wardrobe-list button:disabled{opacity:.51}.wardrobe-list .gear-label{display:block;font-weight:650}.wardrobe-list .gear-rule{font-size:12px}
+.wardrobe-help{font-size:12px;margin:12px 0 0;line-height:1.6}
+@media(max-width:440px){.wardrobe-showcase{grid-template-columns:94px minmax(0,1fr);gap:8px}.wardrobe-figure{width:92px;height:110px}.wardrobe-figure svg{width:88px;height:88px}.wardrobe-list{gap:4px}.wardrobe-list button{padding:6px 5px;font-size:12px}}
+.tile .pixel-sprite{image-rendering:pixelated}
+`;
+document.head.append(css);
+const originalRabbit=window.rabbitPixels;
+// Detailed 64x64 art uses the older body as a foundation, then overlays equipment
+// only below the face or above the ears. No scarf pixels touch the eyes.
+window.rabbitPixels=function(facing='down',step=0,outfit=''){
+ let base=originalRabbit(facing,step,'');
+ // body pixels are twice as fine, enabling single-pixel jewelry detail
+ const contents=base.replace(/^.*?<svg[^>]*>/s,'').replace(/<\/svg>\s*$/s,'');
+ const p=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+ const side=facing==='left'||facing==='right', back=facing==='up';
+ let under='',over='';
+ if(outfit==='星降るマント'){
+   under+=p(9,36,45,21,'#55447b')+p(7,42,7,17,'#8470a8')+p(48,43,6,15,'#8470a8')+p(11,56,40,3,'#d7b66b');
+   under+=p(14,46,3,3,'#fff2ac')+p(44,50,3,3,'#fff2ac');
+ }
+ if(outfit==='冒険者のブローチ'){
+   // Small chest ornament, below the face and nose (not a collar/scarf).
+   over+=p(29,52,9,8,'#6a4a79')+p(31,53,5,6,'#e5c375')+p(32,54,3,3,'#a6c5e3')+p(32,58,3,1,'#fff4bb');
+ }
+ if(outfit==='魔法のかばん'){
+   if(back){over+=p(24,42,17,14,'#755438')+p(26,43,13,12,'#a27b52')+p(30,46,5,3,'#e8c372');}
+   else if(side){
+     over+=p(18,44,4,11,'#81623f')+p(21,47,3,8,'#aa8455');
+     over+=p(41,43,16,14,'#6a503b')+p(43,45,12,11,'#a67a4f')+p(46,47,5,3,'#e8c372');
+   }else{
+     // A little shoulder strap below the cheeks, not across the eyes.
+     over+=p(15,44,4,12,'#674c39')+p(18,49,13,3,'#8a6848');
+     over+=p(41,43,16,14,'#6a503b')+p(43,45,12,11,'#a67a4f')+p(46,47,5,3,'#e8c372');
+   }
+ }
+ if(outfit==='法律魔法の杖'){
+   over+=p(56,28,4,28,'#8c6348')+p(54,28,7,4,'#e5c67b')+p(56,20,4,7,'#d7b5ec')+p(53,25,10,3,'#b7daeb')+p(58,18,2,4,'#fff6b6');
+ }
+ if(outfit==='賢者の帽子'){
+   over+=p(10,25,44,7,'#453b63')+p(18,9,27,20,'#554579')+p(22,6,19,6,'#6b5a8b')+p(20,25,24,3,'#e2c67b')+p(27,13,5,4,'#caa8e4');
+ }
+ if(outfit==='星降るマント'){
+   over+=p(30,46,6,5,'#dfba65')+p(32,47,2,2,'#fff6bd');
+ }
+ if(outfit==='銀の法律バッジ'){
+   over+=p(27,48,10,10,'#66728e')+p(28,49,8,8,'#d8e1ee')+p(31,50,2,5,'#8ea6c8')+p(29,53,6,2,'#8ea6c8');
+ }
+ if(outfit==='森のポーチ'){
+   over+=p(40,44,17,12,'#466d50')+p(42,46,13,10,'#7eaa7a')+p(44,48,9,2,'#d1bd79')+p(46,51,5,2,'#51754e');
+ }
+ if(outfit==='月光のペンダント'||outfit==='蒼玉のペンダント'){
+   over+=p(23,45,3,2,'#c6b982')+p(25,47,4,2,'#c6b982')+p(29,48,8,8,outfit==='月光のペンダント'?'#c7a9ec':'#6fb8d6')+p(31,50,4,4,'#ebf7ff')+p(37,47,4,2,'#c6b982')+p(41,45,3,2,'#c6b982');
+ }
+ if(outfit==='星の耳飾り'){
+   over+=p(49,23,6,6,'#edbf76')+p(51,21,2,10,'#fff2bb')+p(47,25,10,2,'#fff2bb')+p(50,24,4,4,'#f4d890');
+ }
+ if(outfit==='大賢者の冠'){
+   over+=p(16,28,34,8,'#c89741')+p(18,21,7,9,'#efcc69')+p(29,15,8,15,'#ffdc79')+p(42,21,6,9,'#efcc69')+p(29,31,7,3,'#87bfe0')+p(39,31,5,3,'#d97daa');
+ }
+ if(outfit==='勇気のエンブレム'){
+   over+=p(27,46,14,14,'#8a9caa')+p(29,47,10,11,'#e0ddbb')+p(32,49,4,7,'#7398a4')+p(30,52,8,2,'#7398a4');
+ }
+ if(outfit==='伝説の羽飾り'){
+   over+=p(49,8,8,8,'#b7d9ec')+p(53,3,5,7,'#d8eff2')+p(58,4,3,9,'#b9d6e4')+p(48,14,5,10,'#80b3cb')+p(48,17,3,4,'#e3f4fa');
+ }
+ // Tiny 64px-level eye shine, and an accessory anchor on the vest.
+ let fine='';
+ if(!back){fine+=p(side?42:25,37,1,1,'#ffffff')+(!side?p(43,37,1,1,'#ffffff'):'');}
+ return `<svg class="pixel-sprite pixel-sprite-hi" viewBox="0 0 64 64" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${under}<g transform="scale(2)">${contents}</g>${fine}${over}</svg>`;
+};
+
+// All humanized residents appear as consistent pixel portraits (shops remain shops).
+function animalKind(q){
+ const n=q.name||'';
+ if(/くま/.test(n))return'bear';
+ if(/キツネ/.test(n))return'fox';
+ if(/フクロウ|研究者|試験官/.test(n))return'owl';
+ if(/リス/.test(n))return'squirrel';
+ if(/ハリネズミ/.test(n))return'hedgehog';
+ if(/ネズミ/.test(n))return'mouse';
+ if(/ネコ/.test(n))return'cat';
+ if(/コトリ/.test(n))return'bird';
+ if(/ハムスター/.test(n))return'hamster';
+ if(/シカ/.test(n))return'deer';
+ if(/コウモリ/.test(n))return'bat';
+ if(/番人|🐺/.test(n))return'wolf';
+ if(/カメ/.test(n))return'turtle';
+ if(/チョウ/.test(n))return'butterfly';
+ return'owl';
+}
+function animalFace(kind){
+ const palettes={bear:['#986b4d','#d4aa80','#694733'],fox:['#d88446','#fff0d3','#96532e'],owl:['#977c65','#f6e2bb','#665144'],squirrel:['#b77743','#e7b27a','#865231'],hedgehog:['#9b7860','#ebd2a9','#574435'],mouse:['#9998aa','#e8c6d3','#6c647c'],cat:['#e7b353','#f5db9f','#ae813d'],bird:['#89acc0','#d2e7ef','#567b90'],hamster:['#cb9872','#f4dac0','#8e644e'],deer:['#a97b59','#edd0a9','#6a4a35'],bat:['#7d758f','#c0b5d4','#4b435d'],wolf:['#9397a3','#dae1e7','#535966'],turtle:['#7eaa7a','#c7dcb0','#4e7051'],butterfly:['#bb89c8','#e8d5ef','#775783']};
+ const c=palettes[kind]||palettes.owl, r=(x,y,w,h,f)=>pixelRect(x,y,w,h,f);
+ let a=r(9,28,14,2,'#6d8c61');
+ if(kind==='fox'||kind==='cat'||kind==='wolf'){a+=r(4,4,9,12,c[2])+r(19,4,9,12,c[2])+r(6,7,5,8,c[0])+r(21,7,5,8,c[0]);}
+ else if(kind==='deer'){a+=r(5,3,3,12,c[2])+r(5,4,9,3,c[2])+r(24,3,3,12,c[2])+r(18,4,9,3,c[2]);}
+ else if(kind==='bat'){a+=r(2,7,8,10,c[2])+r(22,7,8,10,c[2])+r(4,3,7,6,c[0])+r(21,3,7,6,c[0]);}
+ else if(kind==='butterfly'){a+=r(1,7,9,14,c[0])+r(22,7,9,14,c[0])+r(2,10,5,5,c[1])+r(25,10,5,5,c[1])+r(14,4,2,7,c[2])+r(19,4,2,7,c[2]);}
+ else if(kind==='bird'){a+=r(7,3,18,13,c[0]);}
+ else if(kind==='hedgehog'){a+=r(4,6,24,17,c[2])+r(5,3,4,9,c[2])+r(11,2,4,9,c[2])+r(19,2,4,9,c[2])+r(24,5,4,10,c[2]);}
+ else{a+=r(4,6,9,10,c[0])+r(19,6,9,10,c[0])+r(7,8,5,6,c[1])+r(20,8,5,6,c[1]);}
+ if(kind==='owl'){a+=r(7,4,6,9,c[2])+r(19,4,6,9,c[2]);}
+ a+=r(9,6,14,3,c[2])+r(6,9,20,4,c[0])+r(4,13,24,10,c[0])+r(7,23,18,4,c[0])+r(10,26,12,2,c[2]);
+ a+=r(8,14,16,11,c[1]);
+ if(kind==='owl'){a+=r(7,12,9,8,'#f0e4ce')+r(17,12,9,8,'#f0e4ce');}
+ a+=r(10,16,3,4,'#3f3542')+r(20,16,3,4,'#3f3542')+r(11,16,1,1,'#fff')+r(21,16,1,1,'#fff');
+ if(kind==='bird'||kind==='owl'){a+=r(15,21,4,3,'#e8ad58')+r(16,24,2,2,'#cf8c44');}
+ else{a+=r(14,22,5,3,c[2])+r(12,25,9,1,c[2])+r(9,22,3,2,'#e7b0ae')+r(22,22,3,2,'#e7b0ae');}
+ if(kind==='turtle'){a+=r(5,6,22,6,'#52744f')+r(7,4,18,5,'#78965b');}
+ return pixelSVG(a);
+}
+const renderBefore=window.render;
+window.render=function(){
+ renderBefore();
+ const tiles=$('map').children;
+ for(let y=0;y<11;y++)for(let x=0;x<15;x++){
+   const q=activeQ().find(n=>n.x===x&&n.y===y),cell=tiles[y*15+x];
+   if(!q||!cell||s.x===x&&s.y===y)continue;
+   if(q.id===2||/図書館|パン屋/.test(q.name))continue; // keep the pixel buildings
+   cell.innerHTML=animalFace(animalKind(q));
+ }
+ updateAvatar();
+};
+
+// Compact top-left status panel; the equipped bunny is its own tappable button.
+const stats=document.querySelector('.stats');
+const avatar=document.createElement('button');avatar.id='avatarShortcut';avatar.type='button';avatar.className='status-avatar';avatar.setAttribute('aria-label','うさぎの着せ替え・装備を開く');avatar.title='装備を着せ替える';
+const info=document.createElement('div');info.className='status-info';
+const totals=document.createElement('div');totals.className='status-totals';
+info.append($('lv'),totals);totals.append($('exp'),$('progress'));stats.prepend(avatar,info);
+function updateAvatar(){const b=document.getElementById('avatarShortcut');if(b)b.innerHTML=sprite('rabbit','down',0,s.equipped||'');}
+let wardrobeFacing='down',wardrobeLastFocus=null;
+const back=document.createElement('div');back.id='wardrobeBackdrop';back.className='wardrobe-backdrop';back.hidden=true;
+back.innerHTML='<div class="wardrobe-sheet" role="dialog" aria-modal="true" aria-label="うさぎの装備設定"><div class="wardrobe-head"><h2>🐰 冒険者の着せ替え</h2><button id="wardrobeClose" class="wardrobe-close" type="button">✕ 閉じる</button></div><div id="wardrobeContent"></div></div>';
+document.body.append(back);
+function closeWardrobe(){back.hidden=true;wardrobeLastFocus?.focus();}
+$('wardrobeClose').onclick=closeWardrobe;
+back.addEventListener('click',e=>{if(e.target===back)closeWardrobe();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!back.hidden)closeWardrobe();});
+function buildWardrobe(){
+ const root=$('wardrobeContent');root.replaceChildren();
+ const showcase=document.createElement('div');showcase.className='wardrobe-showcase';
+ const fig=document.createElement('div');fig.className='wardrobe-figure';fig.innerHTML=sprite('rabbit',wardrobeFacing,0,s.equipped||'');
+ const right=document.createElement('div');right.className='wardrobe-summary';
+ const heading=document.createElement('strong');heading.textContent='Lv.'+levelNow()+'　'+titleNow();
+ const detail=document.createElement('small');detail.textContent='装備中：'+(s.equipped||'なし');
+ const dir=document.createElement('div');dir.className='wardrobe-directions';
+ [['down','正面','↓'],['left','左','←'],['right','右','→'],['up','後ろ','↑']].forEach(([k,t,arrow])=>{
+  const b=document.createElement('button');b.type='button';b.textContent=arrow;b.title=t;b.setAttribute('aria-label',t);b.setAttribute('aria-pressed',String(wardrobeFacing===k));
+  b.onclick=()=>{wardrobeFacing=k;fig.innerHTML=sprite('rabbit',k,0,s.equipped||'');[...dir.children].forEach(x=>x.setAttribute('aria-pressed',String(x===b)));};dir.append(b);
+ });right.append(heading,detail,dir);showcase.append(fig,right);root.append(showcase);
+ const caption=document.createElement('h3');caption.textContent='装備コレクション（'+gear.length+'種類）';caption.style.margin='9px 0';root.append(caption);
+ const grid=document.createElement('div');grid.className='wardrobe-list';root.append(grid);
+ gear.forEach(([lv,e,n])=>{
+  const unlocked=levelNow()>=lv,selected=s.equipped===n;
+  const b=document.createElement('button');b.type='button';b.disabled=!unlocked;b.setAttribute('aria-pressed',String(selected));
+  const line=document.createElement('span');line.className='gear-label';line.textContent=(unlocked?e:'🔒')+' '+n;
+  const rule=document.createElement('span');rule.className='gear-rule';rule.textContent=selected?'✓ 装備中':unlocked?'Lv.'+lv+'で獲得済み':'Lv.'+lv+'で開放';
+  b.append(line,rule);b.onclick=()=>{s.equipped=selected?'':n;save(false);render();buildWardrobe();};grid.append(b);
+ });
+ const note=document.createElement('p');note.className='wardrobe-help';note.textContent='装備を外すときは選択中の装備をもう一度押してね。今は1つずつ装備できるよ。レベルが上がると新しいアクセサリーが開放される。';root.append(note);
+}
+function openWardrobe(){wardrobeLastFocus=document.activeElement;wardrobeFacing='down';buildWardrobe();back.hidden=false;$('wardrobeClose').focus();}
+avatar.onclick=openWardrobe;
+// Keep the existing Record → Equipment menu in sync with the new gear names.
+render();
+})();
+</script>
 </html>
