@@ -1013,4 +1013,248 @@ avatar.onclick=openWardrobe;
 render();
 })();
 </script>
+
+<script>
+(()=>{
+'use strict';
+// Ver.0.9.3: storybook title, illustrated B-style chapter cards, improved character proportions.
+const ver=document.querySelector('.game-header>span');if(ver)ver.textContent='Ver.0.9.3';
+const sheet=document.createElement('style');
+sheet.textContent=`
+/* Title and large illustrated chapter cards */
+#openingScreen{margin:8px auto 16px;max-width:980px;position:relative;overflow:hidden;border-radius:20px;padding:clamp(18px,4vw,40px);background:linear-gradient(155deg,#375746,#4f6e60 48%,#293d38);border:3px solid #8ea484;color:#fff8e7;box-shadow:0 8px 24px #10291b55}
+#openingScreen[hidden]{display:none!important}
+.start-sparkle{position:absolute;pointer-events:none;opacity:.36;font-size:18px}.start-sparkle.a{top:9%;left:10%}.start-sparkle.b{top:16%;right:9%}.start-sparkle.c{bottom:12%;left:7%}.start-sparkle.d{bottom:8%;right:12%}
+.start-inner{position:relative;z-index:1;display:flex;align-items:center;gap:clamp(12px,4vw,42px);justify-content:center}
+.start-art{width:clamp(155px,33%,280px);flex:none;padding:12px;border:4px solid #b6ca9e;background:repeating-conic-gradient(#91ae86 0 25%,#a3bc94 0 50%) 50%/32px 32px;border-radius:18px;box-shadow:inset 0 0 0 4px #e8e4c98a}
+.start-art svg{width:100%;height:auto;display:block;image-rendering:pixelated}
+.start-copy{flex:1;max-width:530px}.start-overline{letter-spacing:.16em;color:#ecdbb4;font-size:13px}.start-title{margin:6px 0 13px!important;line-height:1.35;font-size:clamp(26px,3.7vw,46px)!important;color:#fff9e9;text-shadow:2px 3px #1e392d}.start-sub{font-size:clamp(13px,1.6vw,16px);line-height:1.75;color:#e0eadb}
+.start-cta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}.start-cta button{min-height:52px;background:#f4dba4;border:2px solid #fff0c9;border-radius:10px;font-weight:750}.start-cta button.primary{grid-column:1/-1;background:#ffe7b0;font-size:19px}.start-cta button:not(.primary){background:#cfdec0}.start-caption{color:#d6e5d4;font-size:12px;margin-top:10px}
+@media(max-width:580px){.start-inner{flex-direction:column;text-align:center}.start-art{width:min(68%,220px)}.start-copy{width:100%}.start-cta{margin-top:15px}.start-title{font-size:28px!important}}
+#chapters.chapter-list{display:block;max-width:1120px;margin:10px auto 32px}
+.chapter-screen-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 17px}.chapter-screen-top h2{font-size:21px;margin:0}.chapter-screen-top button{background:#dce7cd;min-height:40px;white-space:nowrap}
+.chapter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.chapter-choice{position:relative;display:flex;align-items:center;gap:15px;width:100%;text-align:left;padding:15px;border:2px solid #b3c29a;background:linear-gradient(120deg,#f1e8ce,#e4eacb);border-radius:15px;min-height:135px;box-shadow:0 4px 0 #18362d55;transition:transform .12s ease,background .12s ease}
+.chapter-choice:active{transform:translateY(2px);box-shadow:0 2px 0 #18362d55}.chapter-choice:focus-visible{outline:4px solid #f9d987;outline-offset:2px}
+.chapter-choice-art{width:108px;height:108px;flex:0 0 108px;border-radius:13px;background:var(--chapter-bg,#abc3a4);display:grid;place-items:center;border:3px solid #fff9dfaa;box-shadow:inset 0 0 0 3px #00000010;overflow:hidden}
+.chapter-choice-art svg{width:91%;height:91%;image-rendering:pixelated}.chapter-choice-body{display:flex;flex-direction:column;gap:5px;min-width:0}.chapter-choice-num{font-size:12px;font-weight:750;color:#54715a;letter-spacing:.08em}.chapter-choice-title{font-size:clamp(17px,2vw,22px);font-weight:800;line-height:1.35;color:#293d31}.chapter-choice-desc{font-size:13px;line-height:1.35;color:#5b654c}.chapter-choice-progress{font-size:12px;color:#475c41;margin-top:2px}.chapter-choice-progressbar{height:6px;border-radius:6px;background:#c8ccaf;overflow:hidden;margin-top:2px}.chapter-choice-progressbar span{height:100%;display:block;background:#779866}
+.chapter-choice::after{content:'▶';font-size:12px;color:#5b7859;position:absolute;right:12px;bottom:11px}
+@media(max-width:710px){.chapter-grid{grid-template-columns:1fr}.chapter-choice{min-height:117px}.chapter-choice-art{width:94px;height:94px;flex-basis:94px}}
+@media(max-width:395px){.chapter-choice{gap:9px;padding:9px;min-height:104px}.chapter-choice-art{width:81px;height:81px;flex-basis:81px}.chapter-choice-title{font-size:16px}.chapter-choice-desc{font-size:11px}}
+/* Hero remains a single, readable sprite at every viewport width */
+.status-avatar svg,.wardrobe-figure svg,.tile .pixel-sprite{image-rendering:pixelated}
+.panel button .px-inline, .panel h2 .px-inline,.panel h3 .px-inline,.chapter-heading .px-inline{width:23px;height:23px;display:inline-flex;align-items:center;justify-content:center;margin-right:5px;vertical-align:-5px}
+.panel button .px-inline svg,.panel h2 .px-inline svg,.panel h3 .px-inline svg,.chapter-heading .px-inline svg{width:100%;height:100%;image-rendering:pixelated}
+.panel button .px-inline{width:18px;height:18px;vertical-align:-3px}
+`;document.head.append(sheet);
+
+const rect=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+const art=(body,size=64)=>`<svg viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${body}</svg>`;
+const p=(x,y,w,h,c)=>rect(x,y,w,h,c);
+
+// New 64px bunny: head and chest have separate zones so jewellery never sits in the face.
+window.rabbitPixels=function(facing='down',step=0,outfit=''){
+ const side=facing==='left'||facing==='right',back=facing==='up',w=(step%2)?2:0;
+ const white='#fff7ef',shadow='#d5c8ce',edge='#6d6170',pink='#e7a1b6',dark='#393143',violet='#77639e',lightV='#a99ad3',gold='#f3d37c';
+ let z='';
+ z+=p(12,60,40,2,'#688965');
+ // Cape lies behind head and chest.
+ if(outfit==='星降るマント')z+=p(8,36,48,22,'#594a86')+p(11,54,42,4,'#bca1dd')+p(13,53,4,3,gold)+p(44,52,4,3,gold);
+ // Large jacket/body with distinctly visible shoulders, a chest, and lower torso.
+ z+=p(13,36,38,22,edge)+p(15,37,34,19,violet)+p(18,39,28,4,lightV);
+ z+=p(9,39,8,15,edge)+p(10,40,7,13,white)+p(47,39,8,15,edge)+p(47,40,7,13,white);
+ z+=p(16,56+w,13,5,edge)+p(17,56+w,11,4,white)+p(35,57-w,13,5,edge)+p(36,57-w,11,4,white);
+ if(side){
+   z+=p(20,3,9,20,edge)+p(21,4,7,18,white)+p(24,7,2,13,pink);
+   z+=p(33,2,9,21,edge)+p(34,3,7,19,white)+p(37,6,2,13,pink);
+   z+=p(14,19,38,23,edge)+p(15,20,36,20,white)+p(48,27,10,10,white);
+   z+=p(45,29,4,6,dark)+p(47,30,1,2,'#fff');z+=p(55,35,3,2,pink);
+ }else{
+   z+=p(14,3,10,22,edge)+p(16,4,7,20,white)+p(18,7,3,15,back?shadow:pink);
+   z+=p(39,2,10,23,edge)+p(41,3,7,21,white)+p(43,6,3,16,back?shadow:pink);
+   z+=p(11,19,42,23,edge)+p(13,20,38,21,back?shadow:white);
+   z+=p(9,27,5,12,shadow)+p(50,27,5,12,shadow);
+   if(!back){
+     z+=p(22,29,4,5,dark)+p(39,29,4,5,dark)+p(22,29,1,1,'#fff')+p(39,29,1,1,'#fff');
+     z+=p(17,35,5,3,'#f5d0d9')+p(43,35,5,3,'#f5d0d9')+p(31,35,4,3,'#b8768e')+p(29,38,8,1,edge);
+   }else z+=p(21,24,22,4,shadow);
+ }
+ // All jewelry sits on jacket x~20..40, y~44..52, well below nose (y35).
+ if(outfit==='冒険者のブローチ'){
+   z+=p(21,43,11,11,'#4e465f')+p(23,44,8,8,gold)+p(25,45,4,5,'#86bde1')+p(26,46,2,2,'#edfcff');
+ }else if(outfit==='銀の法律バッジ'||outfit==='勇気のエンブレム'){
+   z+=p(21,43,12,12,'#626c85')+p(23,45,8,8,'#dfeaf0')+p(26,46,3,5,'#7e9bcb');
+ }else if(outfit==='月光のペンダント'||outfit==='蒼玉のペンダント'){
+   z+=p(25,41,3,4,gold)+p(28,44,3,3,gold)+p(31,47,8,8,outfit==='月光のペンダント'?'#bda4eb':'#7bbce3')+p(33,48,3,3,'#e8ffff')+p(39,44,3,3,gold);
+ }else if(outfit==='魔法のかばん'||outfit==='森のポーチ'){
+   const satchel=outfit==='森のポーチ';
+   z+=p(side?21:14,40,4,13,satchel?'#547956':'#8a6745');
+   z+=p(45,44,14,13,satchel?'#466d50':'#684c39')+p(47,45,11,11,satchel?'#82ac82':'#b08354')+p(49,48,6,3,gold);
+ }else if(outfit==='法律魔法の杖'){
+   z+=p(57,27,3,30,'#8b634c')+p(54,25,10,5,gold)+p(57,17,5,9,'#c8b9e6')+p(58,19,2,3,'#fff2bd');
+ }else if(outfit==='賢者の帽子'){
+   z+=p(10,22,43,5,'#453958')+p(18,8,27,16,'#5a4b7d')+p(22,5,19,5,'#5a4b7d')+p(22,21,20,3,gold);
+ }else if(outfit==='大賢者の冠'){
+   z+=p(15,23,36,7,'#ba8a36')+p(18,15,8,12,gold)+p(29,11,8,16,'#ffe190')+p(43,16,7,11,gold)+p(31,25,6,3,'#8cc9ea');
+ }else if(outfit==='星の耳飾り'){
+   z+=p(47,23,8,8,gold)+p(50,20,3,14,'#ffe7a5')+p(44,26,15,3,'#ffe7a5');
+ }else if(outfit==='伝説の羽飾り'){
+   z+=p(48,7,9,7,'#c4e5f2')+p(51,3,6,8,'#e9faff')+p(56,5,4,10,'#abcfe4');
+ }
+ const sprite=art(z,64);
+ return side&&facing==='left'?sprite.replace('<svg ','<svg data-left="true" ').replace('aria-hidden="true">','aria-hidden="true"><g transform="translate(64 0) scale(-1 1)">').replace('</svg>','</g></svg>'):sprite;
+};
+
+// Clear animal silhouettes: two large owl eyes and ear tufts; little blue bird with wing & beak.
+function face(kind){
+ let z='';const E='#5b5057';
+ if(kind==='bird'){
+   z+=p(12,14,40,39,'#507f9c')+p(8,21,44,28,'#6da9cb')+p(17,14,29,13,'#9ad1e1')+p(13,33,17,14,'#497b9e')+p(33,35,11,10,'#b0d9eb');
+   z+=p(36,22,5,7,E)+p(39,23,1,2,'#fff')+p(48,31,12,7,'#e7b05f')+p(51,33,7,3,'#ffd782')+p(19,51,5,4,'#9c7451')+p(37,51,5,4,'#9c7451');
+ }else if(kind==='owl'){
+   z+=p(8,5,15,24,'#7d5d4a')+p(41,5,15,24,'#7d5d4a')+p(14,11,36,42,'#9a745e')+p(9,18,46,33,'#9a745e')+p(18,46,29,8,'#6b4d43');
+   z+=p(15,24,16,18,'#f9ead0')+p(33,24,16,18,'#f9ead0')+p(21,28,7,11,'#332d39')+p(37,28,7,11,'#332d39')+p(22,29,2,3,'#fff')+p(38,29,2,3,'#fff');
+   z+=p(29,38,7,8,'#e9a952')+p(31,41,3,4,'#f4ca77');
+ }else if(kind==='fox'){
+   z+=p(6,7,18,20,'#b8693e')+p(40,7,18,20,'#b8693e')+p(12,11,12,18,'#ffcfb1')+p(40,11,12,18,'#ffcfb1')+p(11,22,42,32,'#cd7b42')+p(17,36,30,19,'#fff1e0');
+   z+=p(19,29,6,8,E)+p(39,29,6,8,E)+p(30,39,6,4,E);
+ }else if(kind==='mouse'){
+   z+=p(4,10,21,21,'#9c91a6')+p(39,10,21,21,'#9c91a6')+p(9,15,13,13,'#e9aabc')+p(42,15,13,13,'#e9aabc')+p(15,21,34,33,'#c8bdd0');
+   z+=p(22,31,5,6,E)+p(39,31,5,6,E)+p(31,40,5,4,'#df92ab');z+=p(13,43,12,1,E)+p(39,43,12,1,E);
+ }else if(kind==='hedgehog'){
+   for(let i=0;i<8;i++)z+=p(8+i*6,8+(i%2)*4,6,22,'#66523d');z+=p(11,26,43,28,'#b69777')+p(21,35,30,19,'#ead1ac')+p(40,37,5,5,E)+p(52,46,6,4,'#745443');
+ }else if(kind==='deer'){
+   z+=p(14,4,6,19,'#82604a')+p(9,9,14,5,'#82604a')+p(43,4,6,19,'#82604a')+p(42,9,14,5,'#82604a')+p(14,20,36,33,'#b58a61')+p(21,39,22,13,'#ead6b9')+p(23,30,5,6,E)+p(40,30,5,6,E)+p(31,42,5,4,E);
+ }else if(kind==='cat'){
+   z+=p(9,8,16,24,'#d7a94d')+p(39,8,16,24,'#d7a94d')+p(12,20,40,35,'#f2bf61')+p(20,32,5,7,E)+p(39,32,5,7,E)+p(30,42,5,3,'#9a5d55');
+ }else if(kind==='bear'){
+   z+=p(9,11,17,18,'#92654d')+p(39,11,17,18,'#92654d')+p(11,20,42,35,'#ab7b5b')+p(18,33,6,7,E)+p(40,33,6,7,E)+p(23,41,20,11,'#e8cbb0')+p(30,43,6,4,E);
+ }else if(kind==='squirrel'){
+   z+=p(7,20,15,28,'#98693b')+p(14,16,38,38,'#bc8349')+p(15,8,15,19,'#bc8349')+p(36,8,15,19,'#bc8349')+p(22,31,6,7,E)+p(39,31,6,7,E)+p(29,42,7,5,'#d3ad8e');
+ }else if(kind==='hamster'){
+   z+=p(8,10,19,22,'#b98862')+p(38,10,19,22,'#b98862')+p(13,21,38,34,'#f2cd9d')+p(19,33,5,7,E)+p(40,33,5,7,E)+p(31,42,4,4,'#b78186');
+ }else if(kind==='turtle'){
+   z+=p(11,17,43,37,'#8eb08b')+p(14,11,35,15,'#597d50')+p(20,29,6,7,E)+p(40,29,6,7,E)+p(31,42,5,4,'#71956e');
+ }else if(kind==='butterfly'){
+   z+=p(3,9,25,42,'#b9a8e2')+p(36,9,25,42,'#d0b1e9')+p(10,20,14,20,'#dfc1ed')+p(41,20,14,20,'#f5d1ef')+p(29,15,7,37,'#745f7b')+p(26,7,4,10,'#745f7b')+p(37,7,4,10,'#745f7b');
+ }else{
+   z+=p(11,20,42,33,'#9d9db3')+p(19,33,5,6,E)+p(40,33,5,6,E)+p(30,42,5,4,'#d6a1af');
+ }
+ return art(z,64);
+}
+function animalType(q){const n=q.name||'';
+ if(/フクロウ|研究者|試験官/.test(n))return 'owl';
+ if(/コトリ/.test(n))return 'bird';if(/ハリネズミ/.test(n))return 'hedgehog';if(/キツネ/.test(n))return 'fox';if(/ネズミ/.test(n))return 'mouse';
+ if(/シカ/.test(n))return 'deer';if(/ネコ/.test(n))return 'cat';if(/くま|クマ/.test(n))return 'bear';
+ if(/リス/.test(n))return 'squirrel';if(/ハムスター/.test(n))return 'hamster';if(/カメ/.test(n))return 'turtle';if(/チョウ/.test(n))return 'butterfly';
+ if(/コウモリ/.test(n))return 'bat';if(/番人/.test(n))return 'fox';return 'rabbit';}
+const priorRender=window.render;
+window.render=function(){
+ priorRender();const cells=$('map').children;
+ for(let y=0;y<11;y++)for(let x=0;x<15;x++){
+   let q=activeQ().find(v=>v.x===x&&v.y===y),cell=cells[y*15+x];if(!q||!cell||(x===s.x&&y===s.y))continue;
+   if(q.id===2||/図書館|パン屋/.test(q.name))continue;
+   cell.innerHTML=face(animalType(q));cell.title=q.name;
+ }
+};
+window.render();
+
+function chapterArt(n){
+ let a='';
+ if(n===1){ // warm village, legal book and bakery
+   a+=p(7,26,50,28,'#edd9a9')+p(5,20,54,9,'#b5787c')+p(11,13,42,9,'#c98f8e')+p(18,33,11,21,'#8d6b50')+p(37,32,13,11,'#9ac4c9')+p(39,34,9,7,'#e7eff0');
+   a+=p(10,54,45,4,'#6d965e')+p(20,6,6,9,'#a8c37f')+p(25,2,6,9,'#a8c37f');
+ }else if(n===2){a+=p(17,5,30,54,'#809ea8')+p(20,8,24,48,'#c8e1de')+p(24,12,16,40,'#9cc3c2')+p(13,3,38,6,'#e7d0af')+p(13,55,38,5,'#e7d0af')+p(26,22,9,11,'#fff9e6')+p(29,18,3,21,'#e8b4cd');
+ }else if(n===3){a+=p(6,31,52,26,'#555576')+p(12,21,40,26,'#77739a')+p(27,3,10,26,'#b5a1e8')+p(23,18,18,30,'#9d8bd5')+p(27,11,10,30,'#e5d9ff')+p(8,48,48,10,'#4e6177');
+ }else if(n===4){a+=p(8,22,49,35,'#e4d8b7')+p(4,17,56,8,'#846773')+p(12,8,40,12,'#ab8793')+p(23,36,18,21,'#917a58')+p(29,31,6,6,'#e4bd73')+p(12,30,9,9,'#a2c8d8')+p(43,30,9,9,'#a2c8d8');
+ }else{a+=p(2,46,60,13,'#597c59')+p(10,25,11,28,'#4f6e50')+p(6,14,20,18,'#76a26a')+p(39,25,12,27,'#4f6e50')+p(35,12,23,19,'#76a26a')+p(28,13,8,40,'#bdad80')+p(26,7,12,15,'#d2c48e')+p(23,19,18,5,'#8d7051');}
+ return art(a,64);
+}
+
+// An original miniature law codex for the opening artwork.
+function bookArt(){let z='';
+ z+=p(12,27,40,30,'#665548')+p(13,25,38,28,'#e5d4ac')+p(14,24,17,28,'#f9f0d6')+p(33,24,17,28,'#f9f0d6')+p(30,24,4,31,'#c5b184');
+ z+=p(16,31,13,2,'#987d64')+p(16,36,11,2,'#987d64')+p(16,41,11,2,'#987d64')+p(35,31,13,2,'#987d64')+p(35,36,11,2,'#987d64')+p(35,41,11,2,'#987d64')+p(43,13,2,17,'#a87b57')+p(42,10,5,5,'#e5c884');
+ return art(z);
+}
+function openTitle(){
+ if(chapter)save(false);
+ chapter=0;selectedNpc=null;
+ $('adventure').hidden=true;$('chapters').hidden=true;
+ const screen=document.getElementById('openingScreen');screen.hidden=false;
+ window.scrollTo(0,0);
+}
+const start=document.createElement('section');start.id='openingScreen';start.hidden=true;
+start.innerHTML=`<span class="start-sparkle a">✦</span><span class="start-sparkle b">✦</span><span class="start-sparkle c">✦</span><span class="start-sparkle d">✦</span>
+<div class="start-inner"><div class="start-art">${window.rabbitPixels('down',0,s.equipped||'')}${bookArt()}</div><div class="start-copy"><div class="start-overline">LEGAL FANTASY RPG</div><h2 class="start-title">うさぎ村の<br>法律冒険記</h2><p class="start-sub">小さな法律の謎が、村のあちこちに。<br>ことばを読み解きながら、5つの世界を冒険しよう。</p><div class="start-cta"><button type="button" id="startGame" class="primary">▶ 冒険をはじめる</button><button type="button" id="resumeGame">つづきから</button><button type="button" id="pickChapter">章を選ぶ</button></div><div class="start-caption">今までのセーブデータ・経験値・装備は引き継がれるよ</div></div></div>`;
+$('chapters').before(start);
+start.querySelector('.start-art').style.position='relative';
+const book=start.querySelector('.start-art svg:last-child');book.style.width='44%';book.style.position='absolute';book.style.bottom='-7px';book.style.right='-12px';book.style.filter='drop-shadow(0 3px 2px #2345)';
+start.querySelector('#startGame').onclick=()=>showChapters();
+start.querySelector('#pickChapter').onclick=()=>showChapters();
+start.querySelector('#resumeGame').onclick=()=>enterChapter([1,2,3,4,5].includes(s.lastChapter)?s.lastChapter:1);
+const prevEnter=window.enterChapter;
+window.enterChapter=function(id){start.hidden=true;s.lastChapter=id;prevEnter(id);save(false)};
+window.showChapters=function(){
+ if(chapter)save(false);
+ chapter=0;selectedNpc=null;
+ $('adventure').hidden=true;start.hidden=true;$('chapters').hidden=false;
+ const root=$('chapters');root.replaceChildren();
+ const top=document.createElement('div');top.className='chapter-screen-top';
+ const heading=document.createElement('h2');heading.textContent='📜 冒険する章を選ぼう';
+ const back=document.createElement('button');back.type='button';back.textContent='⌂ タイトルへ';back.onclick=openTitle;
+ top.append(heading,back);root.append(top);
+ const grid=document.createElement('div');grid.className='chapter-grid';root.append(grid);
+ for(const c of chapters){
+  const qs=Q.filter(q=>chapterOf(q)===c.id),done=qs.filter(q=>s.cleared.includes(q.id)).length,ratio=qs.length?100*done/qs.length:0;
+  const card=document.createElement('button');card.type='button';card.className='chapter-choice';card.setAttribute('aria-label',c.title+'、進行 '+done+' / '+qs.length);
+  const palette=['#b3ceb0','#c7b9d7','#8b83b5','#d7b9ae','#9ebb9b'];
+  const artHolder=document.createElement('span');artHolder.className='chapter-choice-art';artHolder.style.setProperty('--chapter-bg',palette[c.id-1]);artHolder.innerHTML=chapterArt(c.id);
+  const content=document.createElement('span');content.className='chapter-choice-body';
+  const title=(c.title||'').replace(/^[^\p{L}\p{N}]+/u,'').replace(/第\d章\s*/, '').trim();
+  content.innerHTML=`<span class="chapter-choice-num">CHAPTER ${String(c.id).padStart(2,'0')} ／ 第${c.id}章</span><strong class="chapter-choice-title"></strong><span class="chapter-choice-desc"></span><span class="chapter-choice-progress">クエスト ${done}/${qs.length} ${done===qs.length?'✔ COMPLETE':''}</span><span class="chapter-choice-progressbar"><span style="width:${ratio}%"></span></span>`;
+  content.querySelector('.chapter-choice-title').textContent=title;
+  content.querySelector('.chapter-choice-desc').textContent=c.desc;
+  card.append(artHolder,content);card.onclick=()=>enterChapter(c.id);grid.append(card);
+ }
+ window.scrollTo(0,0);
+};
+// Keep old save data; start with the cover screen, not a forced restart of game progress.
+openTitle();
+
+// Convert leading emojis on secondary learning panels into matching small pixel symbols.
+function miniature(label){
+ const word=String(label).replace(/^[^\p{L}\p{N}]+/u,'').trim();
+ if(/辞典|万華鏡/.test(word))return art(p(10,9,44,42,'#806399')+p(14,12,36,34,'#e3d8ef')+p(20,20,24,4,'#7b639b')+p(20,29,18,4,'#7b639b'));
+ if(/講義|学校/.test(word))return chapterArt(4);
+ if(/ボス|戦/.test(word))return chapterArt(3);
+ if(/条文|図書館|原文/.test(word))return bookArt();
+ if(/弱点|ミス|間違/.test(word))return art(p(16,8,32,47,'#b5555e')+p(22,13,21,37,'#e8d9c8')+p(26,21,12,3,'#a86c77')+p(26,28,10,3,'#a86c77'));
+ if(/記録|カルテ/.test(word))return art(p(14,8,38,48,'#6695b0')+p(19,13,28,36,'#eef4ec')+p(24,23,16,3,'#7398b0')+p(24,31,14,3,'#7398b0'));
+ if(/装備|着せ替え/.test(word))return art(p(16,13,32,32,'#7f679e')+p(21,9,23,8,'#aa92c6')+p(26,23,14,12,'#e6d2a8'));
+ if(/クイズ|問題|道場|演習|挑戦/.test(word))return art(p(13,8,39,47,'#7c9f77')+p(19,14,27,35,'#f4e8cb')+p(23,23,17,3,'#687c5e')+p(23,32,12,3,'#687c5e'));
+ if(/セーブ/.test(word))return art(p(14,9,37,44,'#6d6f80')+p(20,15,24,18,'#b5c9cb')+p(22,39,18,8,'#e8e1cf'));
+ if(/戻る|探索/.test(word))return art(p(11,27,40,9,'#77966a')+p(11,21,15,21,'#77966a'));
+ return art(p(27,6,9,51,'#d0b06d')+p(13,27,37,9,'#d0b06d')+p(19,16,25,30,'#f6dea1'));
+}
+const emoStart=/^\s*(?:[\p{Extended_Pictographic}\u2600-\u27BF][\uFE0E\uFE0F\u200D\p{Extended_Pictographic}]*)+\s*/u;
+function paintPanel(container){
+ if(!container)return;
+ const nodes=container.querySelectorAll('h2,h3,button');
+ for(const el of nodes){
+   if(el.dataset.pxHeading==='1'||el.dataset.iconified==='1'||el.querySelector('.pixel-btn-wrap,.px-inline'))continue;
+   // Do not rewrite complex controls: preserve child nodes, input state and button events.
+   if([...el.childNodes].some(n=>n.nodeType===1))continue;
+   const text=el.textContent||'',match=text.match(emoStart);if(!match)continue;
+   const meaning=text.slice(match[0].length).trim();if(!meaning)continue;
+   const sp=document.createElement('span');sp.className='px-inline';sp.innerHTML=miniature(meaning);
+   el.textContent=meaning;el.prepend(sp);el.dataset.pxHeading='1';
+ }
+}
+const panel=$('panel');
+let painting=false;
+const observer=new MutationObserver(()=>{if(painting)return;painting=true;observer.disconnect();try{paintPanel(panel);}finally{observer.observe(panel,{subtree:true,childList:true,characterData:true});painting=false;}});
+observer.observe(panel,{subtree:true,childList:true,characterData:true});paintPanel(panel);
+})();
+</script>
 </html>
