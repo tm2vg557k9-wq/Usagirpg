@@ -44,7 +44,21 @@ main{padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-
 .boss-answer-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.boss-answer-buttons button{margin:0!important;padding:13px 5px;min-height:50px;font-weight:bold;background:#e9dcc2}
 .boss-mini{font-size:13px;color:#5e574c}.boss-outcome{font-size:21px;font-weight:bold;text-align:center;background:#e8dec3;border-radius:10px;padding:14px;margin:10px 0}
 @media(max-width:410px){.boss-list{grid-template-columns:1fr}.boss-stage{padding:10px}.boss-fighters{gap:7px}}
-</style><main><header class="game-header"><h1>🐰 うさぎ村の法律冒険記</h1><span>Ver.0.7</span></header><div class="stats"><span id="lv"></span><span id="exp"></span><span id="progress"></span></div><section id="chapters" class="chapter-list"></section><section id="adventure" hidden><div class="chapter-heading"><h2 id="chapterTitle"></h2><button class="chapter-back" onclick="showChapters()">← 章選択</button></div><nav class="view-switch" aria-label="画面表示"><button type="button" data-view="both" onclick="setView('both')">🐰 通常</button><button type="button" data-view="map" onclick="setView('map')">🗺️ 探索のみ</button><button type="button" data-view="read" onclick="setView('read')">📖 読書モード</button></nav><div class="game-layout" id="gameLayout" data-view="both"><div class="map-side" id="mapSide"><label class="map-size">マップの大きさ <select id="mapSize"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><div id="map"></div><div class="map-actions"><div class="controls"><span></span><button onclick="move(0,-1)">↑</button><span></span><button onclick="move(-1,0)">←</button><button onclick="move(0,1)">↓</button><button onclick="move(1,0)">→</button></div><div class="talk-slot"><button id="talkAction" hidden onclick="talk()">💬 話す</button></div></div><div id="npcChoices" class="npc-choice"></div><div id="status" role="status"></div><p class="map-help">住民の隣で話そう。木・川・建物・噴水は通れないよ。</p></div><div class="study-side"><button id="menuToggle" class="menu-toggle" type="button" aria-expanded="true" onclick="toggleStudyMenu()">▲ 学習メニューをしまう</button><div class="menu" id="studyMenu"><button onclick="openDictionary()">🔮 辞典</button><button onclick="lawLibrary()">📚 民法条文</button><button onclick="training()">🪶 読解修行</button><button onclick="school()">🏫 学校</button><button onclick="dojo()">🥋 問題道場</button><button onclick="bossArena()">👑 ボス戦</button><button onclick="altPractice()">🪞 別表現問題</button><button onclick="weak()">📕 弱点</button><button onclick="record()">📖 記録</button><button onclick="save(true)">💾 セーブ</button></div><section class="panel" id="panel"></section></div></div></section></main><script>
+
+/* Ver.0.8: four difficulty tiers, compact chapter filter, and boss difficulty selection. */
+.difficulty-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px}
+.difficulty-grid button{margin:0!important;text-align:left;min-width:0;min-height:62px;background:#e9dfc8;padding:9px!important;line-height:1.35}
+.difficulty-grid button[aria-pressed=true]{background:#c5d5af;outline:3px solid #64845a}
+.difficulty-grid button strong{display:block;font-size:15px}.difficulty-grid button small{font-size:12px;display:block;margin-top:3px;opacity:.83}
+.difficulty-description{background:#ede6d0;padding:10px 12px;border-radius:8px;margin:9px 0;font-size:14px}
+.dojo-scorebar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:13px}
+.dojo-scorebar span{border-radius:7px;padding:5px 8px;background:#eee4cd}
+.dojo-question .story-badge{font-size:13px;font-weight:700;color:#695183;display:block;margin-bottom:8px}
+.boss-difficulty-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:12px 0}
+.boss-difficulty-grid button{margin:0!important;font-size:14px;min-height:40px}
+.boss-difficulty-grid button[aria-pressed=true]{outline:3px solid #587849;background:#c7d8b4}
+@media(max-width:380px){.difficulty-grid button{padding:7px!important}.difficulty-grid button strong{font-size:13px}}
+</style><main><header class="game-header"><h1>🐰 うさぎ村の法律冒険記</h1><span>Ver.0.8</span></header><div class="stats"><span id="lv"></span><span id="exp"></span><span id="progress"></span></div><section id="chapters" class="chapter-list"></section><section id="adventure" hidden><div class="chapter-heading"><h2 id="chapterTitle"></h2><button class="chapter-back" onclick="showChapters()">← 章選択</button></div><nav class="view-switch" aria-label="画面表示"><button type="button" data-view="both" onclick="setView('both')">🐰 通常</button><button type="button" data-view="map" onclick="setView('map')">🗺️ 探索のみ</button><button type="button" data-view="read" onclick="setView('read')">📖 読書モード</button></nav><div class="game-layout" id="gameLayout" data-view="both"><div class="map-side" id="mapSide"><label class="map-size">マップの大きさ <select id="mapSize"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><div id="map"></div><div class="map-actions"><div class="controls"><span></span><button onclick="move(0,-1)">↑</button><span></span><button onclick="move(-1,0)">←</button><button onclick="move(0,1)">↓</button><button onclick="move(1,0)">→</button></div><div class="talk-slot"><button id="talkAction" hidden onclick="talk()">💬 話す</button></div></div><div id="npcChoices" class="npc-choice"></div><div id="status" role="status"></div><p class="map-help">住民の隣で話そう。木・川・建物・噴水は通れないよ。</p></div><div class="study-side"><button id="menuToggle" class="menu-toggle" type="button" aria-expanded="true" onclick="toggleStudyMenu()">▲ 学習メニューをしまう</button><div class="menu" id="studyMenu"><button onclick="openDictionary()">🔮 辞典</button><button onclick="lawLibrary()">📚 民法条文</button><button onclick="training()">🪶 読解修行</button><button onclick="school()">🏫 学校</button><button onclick="dojo()">🥋 四段階道場</button><button onclick="bossArena()">👑 ボス戦</button><button onclick="altPractice()">🪞 別表現問題</button><button onclick="weak()">📕 弱点</button><button onclick="record()">📖 記録</button><button onclick="save(true)">💾 セーブ</button></div><section class="panel" id="panel"></section></div></div></section></main><script>
 const $=id=>document.getElementById(id);const key='usagi-rpg-v2';let s={x:5,y:5,exp:0,cleared:[]};try{let a=localStorage.getItem(key);if(a){let b=JSON.parse(a);if(Array.isArray(b.cleared)&&Number.isInteger(b.x)&&Number.isInteger(b.y)&&b.x>=0&&b.x<15&&b.y>=0&&b.y<11)s=b}else{let old=JSON.parse(localStorage.getItem('usagi-rpg-v1')||'null');if(old){s.exp=Number(old.exp)||0;s.cleared=(old.cleared||[]).filter(v=>[2,6,8,17].includes(v));}}}catch(e){}
 const Q=[
 {id:6,x:2,y:2,name:'🐻 くまさん',story:'キツネさんがぼくの許可なく土地の契約を結んだんだ。ぼくはまだ認めていないよ。',q:'本人が追認しない限り、無権代理行為の効力は本人に帰属しない。',easy:'本人があとから認めなければ、無権代理の契約の効果は本人に生じない。',parts:['条件：本人が追認しない限り','主語：無権代理行為の効力','結論：本人に帰属しない'],a:true,why:'民法113条。本人の意思を守るため、権限のない人が勝手に結んだ契約は原則として本人を拘束しない。'},
@@ -81,7 +95,7 @@ const R=[
 {id:117,base:17,name:'先生・復習',q:'善意であることは、直ちに無過失であることを意味しない。',easy:'知らなかったからといって、必ず注意不足がなかったとはいえない。',parts:['主語：善意であること','結論：無過失を直ちに意味しない'],a:true,why:'善意と無過失は別々の条件。'},
 {id:102,base:2,name:'図書館・復習',q:'本人が無権代理人を単独相続した場合、追認を拒絶できることと117条の責任を承継することは両立し得る。',easy:'本人が契約を認めなくても、無権代理人が負っていた責任を引き継ぐ場合がある。',parts:['条件：本人が無権代理人を単独相続','結論：追認拒絶と責任承継は両立し得る'],a:true,why:'追認による契約の効力と、相続による責任の承継は別問題。'}];
 function lesson(q){panel('📖 '+q.name+' のミニ講義',q.story);(lessons[q.id]||[]).forEach((t,i)=>{let d=document.createElement('p');d.textContent=(i+1)+'．'+t;$('panel').append(d)});btn('演習へ',()=>{rewardOnce('lesson-'+q.id,10);quiz(q)});btn('学校へ',school)}
-function school(){panel('🏫 法律魔法学校','単元を選ぼう。講義 → 演習 → 復習。');['契約のはじまり','意思表示の庭','真意を探す洞窟','守られし者の学び舎','代理・無権代理'].forEach((name,i)=>{let h=document.createElement('h3');h.textContent=name;$('panel').append(h);Q.filter(q=>chapterOf(q)===[1,2,3,4,5][i]).forEach(q=>btn(q.name+' の授業',()=>lesson(q)))});btn('🪶 読解修行',training);btn('📕 弱点復習',weak);btn('📊 法律習熟度',mastery);btn('🧩 個数問題の試練',boss);btn('👑 HP付きボス戦',bossArena);btn('🥋 法律問題道場（追加30問）',dojo);btn('🪞 別表現問題',altPractice)}
+function school(){panel('🏫 法律魔法学校','単元を選ぼう。講義 → 演習 → 復習。');['契約のはじまり','意思表示の庭','真意を探す洞窟','守られし者の学び舎','代理・無権代理'].forEach((name,i)=>{let h=document.createElement('h3');h.textContent=name;$('panel').append(h);Q.filter(q=>chapterOf(q)===[1,2,3,4,5][i]).forEach(q=>btn(q.name+' の授業',()=>lesson(q)))});btn('🪶 読解修行',training);btn('📕 弱点復習',weak);btn('📊 法律習熟度',mastery);btn('🧩 個数問題の試練',boss);btn('👑 HP付きボス戦',bossArena);btn('🥋 法律問題道場（4段階）',dojo);btn('🪞 別表現問題',altPractice)}
 // Only new answers can be connected to an exact prompt, chosen answer and self-reported mistake cause.
 // Preserve legacy aggregates and keep a bounded local history (latest 250 answers).
 function rememberAnswer(q,choice,kind){
@@ -89,7 +103,7 @@ function rememberAnswer(q,choice,kind){
  s.answerSeq=(Number(s.answerSeq)||0)+1;
  const base=q.base||q.id,chapterId=(kind==='dojo'||kind==='boss')?q.chapter:chapterOf(Q.find(x=>x.id===base)||q);
  const entry={id:s.answerSeq,time:Date.now(),kind,base,qid:q.id,chapter:chapterId,
-   title:q.name||(kind==='dojo'?'問題道場 第'+q.id+'問':kind==='boss'?'章ボス戦 第'+q.chapter+'章':'問題'),prompt:q.q,
+   title:q.name||(kind==='dojo'?'問題道場 '+levelTitle(practiceLevel(q))+' 第'+q.id+'問':kind==='boss'?'章ボス戦 第'+q.chapter+'章':'問題'),prompt:q.q,
    selected:choice,answer:q.a,correct:choice===q.a,why:q.why||'',reason:''};
  s.answerHistory.push(entry);
  if(s.answerHistory.length>250)s.answerHistory.splice(0,s.answerHistory.length-250);
@@ -123,7 +137,7 @@ function weakMistakeDetail(a,into){
  let exp=document.createElement('p');exp.className='weak-note';exp.textContent='解説：'+(a.why||'');d.append(exp);
  if(a.time){let time=document.createElement('p');time.className='weak-note';time.textContent=new Date(a.time).toLocaleString('ja-JP');d.append(time)}
  if(!a.reason){let row=document.createElement('div');d.append(row);['知識不足','🐬 想起ミス','読解ミス','まだ分からない'].forEach(t=>btn(t,()=>{a.reason=t;r.textContent='原因：'+t;if(a.kind==='dojo'&&s.dojo?.[a.qid])s.dojo[a.qid].reason=t;else if(a.kind==='boss'){}else if(s.study?.[a.base])s.study[a.base].reason=t;save(false);row.replaceChildren()},row))}
- let original=(a.kind==='dojo'||a.kind==='boss')?dojoItems.find(x=>x.id===a.qid):a.kind==='alternate'?R.find(x=>x.id===a.qid&&x.base===a.base):Q.find(x=>x.id===a.qid);
+ let original=(a.kind==='dojo'||a.kind==='boss')?allPracticeItems.find(x=>x.id===a.qid):a.kind==='alternate'?R.find(x=>x.id===a.qid&&x.base===a.base):Q.find(x=>x.id===a.qid);
  if(original)btn('🔄 この問題を再挑戦',()=>{if(a.kind==='dojo'||a.kind==='boss')dojoSingle(original);else if(a.kind==='alternate')review(original);else quiz(original)},d);
  into.append(d);
 }
@@ -292,10 +306,13 @@ const dojoItems=[
 [4,17,'被補助人には、家庭裁判所の審判がなくても、すべての法律行為について補助人の同意が必要である。',false,'民法17条。審判で定められた特定の行為が対象。'],
 ].map((v,i)=>({id:i+1,chapter:v[0],law:v[1],q:v[2],a:v[3],why:v[4]}));
 let dojoChapter=0,dojoIndex=0,dojoWrongOnly=false,dojoSession=[];
-function dojo(){s.dojo=s.dojo||{};panel('🥋 法律問題道場','全30問のオリジナル○×演習。第1〜5章の問題を収録。何度でも練習できるよ。道場の正誤は別記録で、既存の習熟度や経験値は変えないよ。');
-let answered=dojoItems.filter(q=>s.dojo[q.id]),right=answered.filter(q=>s.dojo[q.id].correct);let p=document.createElement('p');p.textContent='挑戦済み '+answered.length+'/30問 ／ 直近正解 '+right.length+'問 ／ 要復習 '+(answered.length-right.length)+'問';$('panel').append(p);
-btn('🌈 全章ミックス',()=>dojoStart(0,false));[1,2,3,4,5].forEach(c=>{let count=dojoItems.filter(q=>q.chapter===c).length;btn(chapters.find(x=>x.id===c).title+'（'+count+'問）',()=>dojoStart(c,false))});btn('📕 間違えた問題だけ',()=>dojoStart(0,true));btn('🔎 間違いの詳細を確認',()=>weak('misses'));btn('👑 HP付きボス戦',bossArena);btn('🏫 学校へ',school)}
-function dojoStart(c,wrong){dojoChapter=c;dojoWrongOnly=wrong;dojoIndex=0;dojoSession=dojoItems.filter(q=>(!c||q.chapter===c)&&(!wrong||s.dojo?.[q.id]?.correct===false));dojoQuestion()}
+let dojoDifficulty='standard';
+function difficultyButtons(parent,active,callback){const div=document.createElement('div');div.className='difficulty-grid';div.setAttribute('aria-label','練習の難易度');Object.entries(difficultyMeta).forEach(([key,x])=>{let b=btn(x.icon+' '+x.label,()=>callback(key),div);b.setAttribute('aria-pressed',String(key===active));b.replaceChildren();let title=document.createElement('strong');title.textContent=x.icon+' '+x.label;let sub=document.createElement('small');sub.textContent=x.sub;b.append(title,sub)});parent.append(div)}
+function dojo(){s.dojo=s.dojo||{};if(window.matchMedia('(orientation: portrait)').matches&&$('gameLayout').dataset.view!=='read')setView('read');panel('🥋 法律問題道場','4つの難易度から選べるよ。解答記録は難易度別。EXPと法律習熟度は増やさず、間違いは弱点カルテに残るよ。');difficultyButtons($('panel'),dojoDifficulty,l=>{dojoDifficulty=l;dojo()});let level=difficultyMeta[dojoDifficulty],desc=document.createElement('div');desc.className='difficulty-description';desc.textContent=level.icon+' '+level.label+'：'+level.desc;$('panel').append(desc);
+const selected=allPracticeItems.filter(q=>q.level===dojoDifficulty);let answered=selected.filter(q=>s.dojo[q.id]);let right=answered.filter(q=>s.dojo[q.id].correct);let score=document.createElement('div');score.className='dojo-scorebar';score.innerHTML='<span>📘 収録 '+selected.length+'問</span><span>✅ 挑戦済 '+answered.length+'問</span><span>🌟 直近正解 '+right.length+'問</span><span>📕 要復習 '+(answered.length-right.length)+'問</span>';$('panel').append(score);
+let h=document.createElement('h3');h.textContent='出題する範囲';$('panel').append(h);
+btn('🌈 全章ミックス（'+selected.length+'問）',()=>dojoStart(0,false,dojoDifficulty));[1,2,3,4,5].forEach(c=>{const count=practiceCount(c,dojoDifficulty);btn(chapters.find(x=>x.id===c).title+'（'+count+'問）',()=>dojoStart(c,false,dojoDifficulty))});btn('📕 この級で間違えた問題だけ',()=>dojoStart(0,true,dojoDifficulty));btn('🔎 弱点の詳細',()=>weak('misses'));btn('👑 HP付きボス戦',bossArena);btn('🏫 学校へ',school)}
+function dojoStart(c,wrong,level=dojoDifficulty){dojoDifficulty=level;dojoChapter=c;dojoWrongOnly=wrong;dojoIndex=0;dojoSession=allPracticeItems.filter(q=>q.level===level&&(!c||q.chapter===c)&&(!wrong||s.dojo?.[q.id]?.correct===false));dojoQuestion()}
 function dojoPool(){return dojoSession}
 const dojoHintById={
 1:'「申込み」と「承諾」はそろっている？',2:'契約の成立に「書面」が必須なのか、例外のあるルールなのか考えよう。',3:'「法令に特別の定めがない限り」という条件を読もう。',4:'「まだ承諾していない」と「常に成立済み」の組合せを確認。',5:'合意と書面作成の役割を分けよう。',6:'契約自由にも法律上の限界がある？',
@@ -303,11 +320,81 @@ const dojoHintById={
 13:'「当然に無効」と「取り消せる」は同じ効果？',14:'動機の錯誤では、事情が相手に「表示」されているか確認。',15:'重大な過失がある場合の例外を探そう。',16:'第三者の「善意」と「無過失」をそれぞれ確認。',17:'詐欺をした人と契約の相手方は同じ人？',18:'第三者の「詐欺」と「強迫」を混ぜていない？',
 19:'代理権のない人の行為が本人に及ぶ条件は？',20:'催告する相手方に「善意」は必要？',21:'催告に返事がないと、法律上はどう扱う？',22:'「善意」と「無過失」は違う条件だよ。',23:'追認の効力が及ぶ時点と第三者の権利に注目。',24:'無権代理人が自分の無権限を「知っていた」場合は？',
 25:'未成年者の同意と「例外」を確認。',26:'「単に権利を得る」行為はどんな扱い？',27:'日用品の購入に関する「ただし書」を思い出そう。',28:'「原則」と「日常生活の例外」を区別。',29:'借財は民法13条に列挙された行為？',30:'被補助人の同意権に「家庭裁判所の審判」が必要か確認。'};
-function dojoQuestion(){const pool=dojoPool();if(!pool.length){panel('🥋 道場','対象の問題はまだないよ。');btn('道場メニュー',dojo);return}if(dojoIndex>=pool.length){dojoEnd();return}const q=pool[dojoIndex];panel('🥋 問題道場　'+(dojoIndex+1)+' / '+pool.length,chapters.find(c=>c.id===q.chapter).title+'　／　第'+q.law+'条');let box=document.createElement('div');box.className='dojo-question';box.textContent=q.q;$('panel').append(box);let hintWrap=document.createElement('div');hintWrap.className='dojo-hint-wrap';let hintButton=document.createElement('button');hintButton.type='button';hintButton.className='dojo-hint-button';hintButton.textContent='💡 ヒントを見る（答えは表示しない）';hintButton.setAttribute('aria-expanded','false');let hintText=document.createElement('div');hintText.className='dojo-hint-text';hintText.hidden=true;const emphasis=[...new Set((q.q.match(/必ず|常に|絶対に|すべて|一切|のみ|限り|原則|例外|場合|とき|第三者|善意|無過失|重大な過失/g)||[]))];const emph=emphasis.length?'特に「'+emphasis.slice(0,5).join('」「')+'」に注目。':'文の中で条件が付いていないか確認しよう。';hintText.textContent='🔎 この問題の注目ポイント\n'+(dojoHintById[q.id]||'主語と条件を確認しよう。')+'\n\n① 主語は誰？\n② 条件・例外はある？\n③ 結論は何？\n'+emph;hintButton.onclick=()=>{hintText.hidden=!hintText.hidden;hintButton.setAttribute('aria-expanded',String(!hintText.hidden));hintButton.textContent=hintText.hidden?'💡 ヒントを見る（答えは表示しない）':'💡 ヒントをしまう'};hintWrap.append(hintButton,hintText);$('panel').append(hintWrap);btn('⭕ 正しい',()=>dojoJudge(q,true));btn('❌ 誤り',()=>dojoJudge(q,false));btn('📚 根拠条文',()=>lawLibrary(String(q.law)));btn('道場メニュー',dojo)}
-function dojoJudge(q,choice){const ok=choice===q.a;s.dojo=s.dojo||{};const prev=s.dojo[q.id]||{attempts:0,correctCount:0};s.dojo[q.id]={attempts:prev.attempts+1,correctCount:prev.correctCount+(ok?1:0),correct:ok,reason:''};const attempt=rememberAnswer(q,choice,'dojo');save(false);panel(ok?'✨ 正解！':'📕 ここを復習しよう',q.why);let p=document.createElement('p');p.textContent='正解：'+(q.a?'⭕ 正しい':'❌ 誤り')+' ／ あなたの回答：'+(choice?'⭕ 正しい':'❌ 誤り');$('panel').append(p);if(!ok)reasonButtons(q,attempt,'dojo');btn('📚 民法第'+q.law+'条',()=>lawLibrary(String(q.law)));btn('🔄 この問題を再挑戦',()=>{dojoChapter=q.chapter;dojoWrongOnly=false;dojoSession=dojoItems.filter(x=>x.chapter===q.chapter);dojoIndex=dojoSession.findIndex(x=>x.id===q.id);dojoQuestion()});btn('次の問題 →',()=>{dojoIndex++;dojoQuestion()});btn('道場メニュー',dojo)}
-function dojoSingle(q){dojoChapter=q.chapter;dojoWrongOnly=false;dojoSession=[q];dojoIndex=0;dojoQuestion()}
-function dojoEnd(){const a=dojoItems.filter(q=>(!dojoChapter||q.chapter===dojoChapter));let checked=a.filter(q=>s.dojo?.[q.id]);let right=checked.filter(q=>s.dojo[q.id].correct);panel('🎉 道場の一区切り','この範囲の直近正解：'+right.length+' / '+checked.length+'問。繰り返しだけで習熟度100%にはならないよ。');btn('間違えた問題を復習',()=>dojoStart(dojoChapter,true));btn('道場メニュー',dojo);btn('📊 法律習熟度',mastery)}
 
+const difficultyMeta={
+ beginner:{icon:'🌱',label:'基礎級',sub:'条文のルールを一つずつ確認',desc:'短い文章で、原則や基本用語を確認。まずここからでも大丈夫。'},
+ standard:{icon:'🌿',label:'標準級',sub:'宅建の定番表現・言い切り',desc:'以前からある30問。過去の回答成績もそのまま引き継ぐよ。'},
+ applied:{icon:'🪄',label:'応用級',sub:'具体例・複数の条件を整理',desc:'登場人物や場面を整理しながら、法律の効果を判断しよう。'},
+ oni:{icon:'👹',label:'鬼級',sub:'長文・複数論点・例外の連続',desc:'条文を知っているだけでは解けない読解問題。焦らず主語と例外を分けよう。'}
+};
+const newPracticeRows={
+ beginner:[
+ [1,522,'売主と買主が、商品と代金について口頭で合意した。法律に特別な定めがなければ、書面がなくても売買契約は成立し得る。',true,'民法522条2項。契約成立に書面は原則不要。ただし特別な法律の定めなどがある場合は別。','「口頭」だけを理由に不成立とはいえないよ。'],
+ [1,521,'法律に特別の定めがない場合でも、誰と契約するかは国が必ず決める。',false,'民法521条。契約するかどうかや相手方を選ぶ自由が基本。','自由の原則と「必ず国が決める」を比べて。'],
+ [1,522,'契約は、原則として申込みと承諾の意思表示が合致することで成立する。',true,'民法522条1項。申込みと承諾の合致が契約成立の基本。','申込みと承諾の関係を確認。'],
+ [2,93,'心裡留保とは、自分の本心と違うことを知りながら意思表示することをいう。',true,'民法93条。心裡留保は原則有効で、相手方の認識などによる例外がある。','本心でないことを誰が知っている？'],
+ [2,94,'当事者どうしが示し合わせて、契約したように装うことは通謀虚偽表示にあたる。',true,'民法94条1項。通謀による虚偽表示は無効。','一人だけでなく、二人の「示し合わせ」が重要。'],
+ [2,94,'通謀虚偽表示は、当事者の間では常に有効な意思表示である。',false,'民法94条1項。通謀虚偽表示は無効。','「通謀」した当事者の間の効果は？'],
+ [3,95,'重要な錯誤に基づく意思表示は、現行民法では一定の要件の下で取り消すことができる。',true,'民法95条1項。現行法は「無効」ではなく「取消し」が基本。','「無効」と「取消し」を区別。'],
+ [3,95,'動機の錯誤は、法律行為の基礎とした事情を相手方に全く表示しなくても、常に取り消すことができる。',false,'民法95条2項。動機の錯誤では、基礎とした事情が表示されていたことが必要。','動機を相手方に表示したかどうか。'],
+ [3,96,'詐欺又は強迫による意思表示は、一定の条件の下で取り消すことができる。',true,'民法96条1項。詐欺・強迫による意思表示は取消しの対象。','契約の「無効」ではなく何ができる？'],
+ [4,5,'未成年者が契約をする場合、原則として法定代理人の同意が必要である。',true,'民法5条1項。単に権利を得る行為など例外はある。','「原則」を読もう。例外は存在する。'],
+ [4,9,'成年被後見人が日用品を購入した場合、成年被後見人であることだけを理由に、その購入を取り消すことはできない。',true,'民法9条ただし書。日用品購入その他日常生活に関する行為は例外。','「日用品の購入」はただし書に登場する。'],
+ [4,13,'被保佐人が借財をするときは、原則として保佐人の同意が必要である。',true,'民法13条1項2号。借財は同意が必要な重要行為の一つ。','「借財」は13条の列挙にある？'],
+ [5,113,'無権代理人がした契約は、本人が追認しなければ、原則として本人に効力が生じない。',true,'民法113条1項。無権代理人の契約は本人の追認がなければ原則本人を拘束しない。','誰に効力が生じるかを確認。'],
+ [5,114,'無権代理の相手方は、本人に対して追認するかどうかを確かめる催告をすることができる。',true,'民法114条。相手方が善意か悪意かにかかわらず催告できる。','「催告」と「取消し」は条件が違う。'],
+ [5,115,'無権代理の相手方が契約時に代理権がないことを知っていた場合でも、いつでも取消しができる。',false,'民法115条ただし書。契約時に代理権がないことを知っていた相手方には取消権がない。','取消しに必要な善意を確認。']
+ ],
+ applied:[
+ [1,522,'うさぎさんが「この本を千円で売ります」と申し込み、リスさんがその条件で承諾した。後日契約書を書く予定でも、特段の事情がなければ既に売買契約が成立し得る。',true,'民法522条。成立に原則書面は不要。後日書面を予定していても、合意の内容・時点を見よう。','申込みと承諾がそろっている？'],
+ [1,522,'キツネさんが「この本を千円で売る」と申し込んだのに対し、くまさんは「八百円なら買う」と返答した。申込みと承諾が完全に一致したので、元の条件で売買契約が成立した。',false,'千円の申込みに対し八百円の返答では条件が一致していない。元の条件での承諾とはいえない。','金額が同じか比べよう。'],
+ [1,521,'パン屋さんは契約相手を自由に選べるのが原則だが、その自由に法令上の制限が設けられる場合もある。',true,'民法521条1項・2項。契約自由にも法令などの制限がある。','「原則」と「法令上の制限」を両立できる？'],
+ [2,93,'ネコさんが本心では売りたくないのに「売ります」と発言した。相手はその本心を知らず、知ることもできなかった。ネコさんの本心だけを理由に、その意思表示は当然に無効とはならない。',true,'民法93条1項。心裡留保は原則有効で、相手方の悪意や過失による例外がある。','相手方は本心を知っていた？'],
+ [2,94,'二人が相談して実際には売るつもりのない土地を売ったことにした。このように示し合わせた意思表示は、当事者の間では原則として有効である。',false,'民法94条1項。通謀虚偽表示は無効。','「二人が相談して」が94条の鍵。'],
+ [2,94,'当事者が通謀して土地売買を装った後、事情を知らない第三者がその外形を信じて権利を取得した。虚偽表示の無効をその善意の第三者に対抗することはできない。',true,'民法94条2項。善意の第三者には虚偽表示の無効を対抗できない。','「対抗できない」の主語と第三者の認識を確認。'],
+ [3,95,'表意者に重大な過失のある錯誤でも、相手方が同一の錯誤に陥っていたなら、重要な錯誤など他の要件を満たす限り取り消せる場合がある。',true,'民法95条3項2号。相手方も同一の錯誤に陥っていたときは重過失の例外となる。','重過失があったときの「例外」を思い出そう。'],
+ [3,96,'第三者がうさぎさんをだまして契約させた。契約の相手方は詐欺を知らず、知ることもできなかった。この事実関係だけで、うさぎさんは民法96条2項により取り消せる。',false,'民法96条2項。第三者詐欺は、相手方が詐欺を知り又は知ることができた場合に限り取消し可能。','だました人は契約の相手？ 相手方は気づけた？'],
+ [3,96,'第三者がうさぎさんを強迫して意思表示させた。契約相手が強迫を知らなかったというだけで、うさぎさんの取消権は当然に否定される。',false,'民法96条。第三者詐欺にある相手方の認識要件を、強迫へそのまま当てはめない。','第三者「詐欺」の条件を「強迫」に持ち込んでない？'],
+ [4,5,'未成年のリスさんが、代金などの負担なく贈り物をもらうだけの行為をした。単に権利を得る行為なので、法定代理人の同意は不要である。',true,'民法5条1項ただし書。単に権利を得る法律行為は同意不要。','負担がなく、単に権利を得るだけ？'],
+ [4,9,'成年被後見人のカメさんが、普段の生活に必要な日用品を購入した。成年被後見人の法律行為は取り消せるという原則だけを理由に、この購入を取り消すことはできない。',true,'民法9条ただし書。日用品購入など日常生活行為は取消しの例外。','日常生活に関する行為の例外を確認。'],
+ [4,17,'被補助人については、家庭裁判所が特定の行為について補助人の同意を要する旨の審判をした場合でも、審判の対象外の行為まで当然に全て同意が必要になるわけではない。',true,'民法17条。審判で定めた対象行為を確認する。','「特定の行為」と「全て」の違い。'],
+ [5,114,'無権代理だと知って契約したリスさんも、本人のくまさんに相当の期間を定めて追認するか確答するよう催告できる。',true,'民法114条。催告は相手方の善意・悪意を問わない。','知っていた場合でも催告はできる？'],
+ [5,115,'代理権がないとは知らずに契約したハリネズミさんには確認不足の過失があった。本人の追認前なら、その過失だけで115条の取消しは否定されない。',true,'民法115条。善意が必要だが、無過失までは要件でない。','「善意」と「無過失」を分けよう。'],
+ [5,116,'本人が無権代理行為を追認したので効力は原則として契約時にさかのぼる。しかし、それによって第三者の権利を害することはできない。',true,'民法116条。遡及効の原則と第三者の権利を害しない例外。','遡及効にも「ただし書」があるよ。']
+ ],
+ oni:[
+ [1,522,'売主Aが買主Bに商品と代金を明示して売買を申し込み、Bが同じ内容で承諾した。法律に書面を要する特則はなく、当事者が書面作成を成立条件とした事情もない。この場合、後日署名する予定であっても、民法522条の原則により書面作成前に契約が成立し得る。',true,'①申込みと承諾が合致。②原則として書面は不要。③書面作成予定と契約成立の時点を分けて考える。','①合致した内容 ②方式の特則 ③結論の言い切りを分けよう。'],
+ [1,521,'次の二つの説明は両立する。「法令に特別の定めがなければ契約を締結するかどうかを自由に決定できる」「契約自由の原則は、どんな内容の契約も法令による制約を受けずに有効となることを意味しない」。',true,'①民法521条は契約自由を定める。②法令の特則などが自由を制限する。両方とも成り立つ。','前半は自由の原則、後半は自由の限界。対立している？'],
+ [1,522,'Aが「この本を千円で売る」と申し込み、Bが「八百円なら買う」と伝えた。Aはこの返答をまだ受け入れておらず、ほかに合意もない。それでも契約は申込みと承諾の合致で成立するのだから、Aの千円の申込みに対する承諾があったものとして既に契約が成立する。',false,'①申込みは千円。②返答は八百円。③合致していない以上、元の条件の承諾はない。前提と結論のつながりを点検。','AとBの示した条件は同じ？ 「それでも」に注意。'],
+ [2,93,'Aは本心でないと知りながらBに売ると表示し、BはAの真意でないと知っていた。その結果、この表示は民法93条1項ただし書により無効となる。さらに、事情を知らずに取引上の地位を得た第三者Cに対しても、Aはこの無効を常に主張できる。',false,'①Bが知っていたので93条1項ただし書の無効。②しかし93条2項は94条2項を準用。③善意の第三者には無効を対抗できない。「常に」が誤り。','当事者間の無効と、善意の第三者への主張を別々に判断。'],
+ [2,94,'AとBが示し合わせて土地を売買したように装い、その外形を信じたCが事情を知らずに権利を取得した。Cには確認不足の過失があったが、そのことだけで民法94条2項による保護が失われ、Aは虚偽表示の無効をCに対抗できる。',false,'①通謀虚偽表示は無効。②94条2項の第三者は善意が要件で、原則として無過失までは要しない。③Cの過失だけで保護は消えない。','第三者に必要なのは「善意」か「善意無過失」か。'],
+ [2,93,'Aが一人で本心と違う売却の意思表示をし、Bはその本心でないことを知っていた。ただしAとBは虚偽の表示をするよう示し合わせてはいない。この場合、Bの悪意だけで通謀が成立するわけではなく、民法93条の心裡留保として効力を検討することになる。',true,'①Aは本心と違うと自覚。②Bの認識と「通謀したか」は別。③示し合わせがなければ通謀虚偽表示とはいえず、93条の心裡留保を検討する。','相手が知っていることと、二人が示し合わせたことは同じ？'],
+ [3,95,'Aが取引上重要な事項について錯誤に陥った。その錯誤にはAの重大な過失があったが、契約相手Bも同一の錯誤に陥っていた。この場合、必要な他の要件を満たす限り、重大な過失があることのみを理由に取消しが一切認められないわけではない。',true,'①重要な錯誤は取消しの問題。②重大な過失は原則障害。③相手方も同一の錯誤なら95条3項2号の例外がある。','重大な過失があったときの例外を探そう。'],
+ [3,96,'第三者CがAをだましてBと契約させ、Bはその詐欺を知り又は知ることができた。Aは96条2項に基づく取消しをした。一方、詐欺を知らず過失もない第三者Dが保護要件を満たす場合でも、Aは取り消したことを理由としてDに当然に対抗できる。',false,'①第三者詐欺でもBの認識要件を満たせば取消し可能。②ただし96条3項で善意無過失の第三者は保護される。③取消し可能と誰に対抗できるかは別。','取消権の発生と、第三者に対抗できるかを切り離そう。'],
+ [3,96,'第三者CがAを強迫し、AはBと契約した。Bは強迫の事実を知らず、注意しても知ることができなかった。この事実だけで、民法96条2項の第三者詐欺と全く同じ理由から、Aの取消しが当然に否定される。',false,'①第三者が行ったのは強迫。②96条2項の相手方の認識要件は第三者詐欺についてのもの。③強迫へ機械的に持ち込まない。','詐欺と強迫で、第三者が関わるときの扱いを区別。'],
+ [4,5,'未成年者Aは法定代理人の同意なく、単に権利だけを得て何ら義務を負わない贈与を受けた。未成年者の法律行為には原則として同意が必要だが、この行為は単に権利を得るものであるため、民法5条1項のただし書を考慮すると同意は不要である。',true,'①未成年者は原則同意が必要。②単に権利を得る行為は5条1項ただし書の例外。③本文とただし書を両方適用して判断。','「単に権利を得る」例外は適用される？'],
+ [4,9,'成年被後見人Aが普段の生活に必要な日用品を購入した。別の取消原因は存在せず、成年被後見人であることだけを理由として取消しを主張している。このとき民法9条本文を適用すれば、同条ただし書を考慮する余地はなく、必ず取り消すことができる。',false,'①9条本文では原則取消し。②ただし書で日用品の購入などは例外。③本文だけで「必ず」とするのは誤り。','本文とただし書の両方を読もう。'],
+ [4,17,'被保佐人Aが借財をする場合と、被補助人Bが補助人の同意を要する旨の審判の対象となった特定の行為をする場合を比較する。前者は民法13条の列挙行為であり、後者は民法17条の審判による。そのため、両者の同意を要する根拠は必ず同一の条文である。',false,'①被保佐人の借財は13条。②被補助人は17条の審判で対象行為を定める。③同意が必要でも根拠は別条文。「必ず同一」が誤り。','「同意が必要」という結論と、その根拠条文を分離。'],
+ [5,114,'無権代理人Xが本人Aの名でBと契約した。BはXに代理権がないと知っていた。この場合、Bは115条による取消しをすることはできないが、114条に従って相当の期間を定めてAに追認するか確答するよう催告することはできる。',true,'①Bは悪意なので115条の取消しは不可。②しかし114条の催告は悪意でも可能。③同じ相手方でも権利ごとに要件が異なる。','取消しと催告、それぞれに善意要件がある？'],
+ [5,115,'無権代理人Xが自分に代理権がないと知りながらBと契約した。BはXの無権限を知らなかったが、確認不足の過失はあった。本人の追認前であるなら、Bは115条の取消しを行える余地があり、Xの117条責任もBの過失だけで常に否定されるわけではない。',true,'①115条の取消しは善意で足り、無過失までは不要。②117条2項2号ただし書では、Xが無権限を知っていた場合は相手方の過失だけで免責されない。③別の権利を別々に判断。','115条の取消権と117条の無権代理人責任は別の制度。'],
+ [5,114,'無権代理の相手方Bが本人Aに相当の期間を定めて追認の確答を催告した。Aは期間内に返答せず、ほかに追認はなかった。この場合、Bが善意であっても悪意であっても、民法114条によってAは追認を拒絶したものとみなされる。',true,'①114条で無回答は追認拒絶とみなす。②相手方の善意・悪意によって無回答の効果が変わる規定ではない。','相手方が善意でも悪意でも、無回答の効果は同じ？']
+ ]
+};
+const practiceExtra=[...newPracticeRows.beginner.map((v,i)=>({id:1001+i,level:'beginner',chapter:v[0],law:v[1],q:v[2],a:v[3],why:v[4],hint:v[5]})),
+ ...newPracticeRows.applied.map((v,i)=>({id:2001+i,level:'applied',chapter:v[0],law:v[1],q:v[2],a:v[3],why:v[4],hint:v[5]})),
+ ...newPracticeRows.oni.map((v,i)=>({id:3001+i,level:'oni',chapter:v[0],law:v[1],q:v[2],a:v[3],why:v[4],hint:v[5]}))];
+const allPracticeItems=[...dojoItems.map(q=>({...q,level:'standard'})),...practiceExtra];
+function practiceLevel(q){return q.level||'standard'}
+function levelTitle(level){const x=difficultyMeta[level]||difficultyMeta.standard;return x.icon+' '+x.label}
+function practiceHint(q){return q.hint||dojoHintById[q.id]||'主語、条件、例外を探してから結論を読もう。'}
+function practiceCount(c,level){return allPracticeItems.filter(q=>(!c||q.chapter===c)&&q.level===level).length}
+
+function dojoQuestion(){const pool=dojoPool();if(!pool.length){panel('🥋 道場','この級の対象問題はまだないよ。別の級や章を選んでみよう。');btn('道場メニュー',dojo);return}if(dojoIndex>=pool.length){dojoEnd();return}const q=pool[dojoIndex];panel('🥋 '+levelTitle(dojoDifficulty)+'　問'+(dojoIndex+1)+' / '+pool.length,chapters.find(c=>c.id===q.chapter).title+'　／　民法第'+q.law+'条');let box=document.createElement('div');box.className='dojo-question';box.textContent=q.q;$('panel').append(box);
+let hintWrap=document.createElement('div');hintWrap.className='dojo-hint-wrap';let hintButton=document.createElement('button');hintButton.type='button';hintButton.className='dojo-hint-button';hintButton.textContent='💡 ヒントを見る（答えは表示しない）';hintButton.setAttribute('aria-expanded','false');let hintText=document.createElement('div');hintText.className='dojo-hint-text';hintText.hidden=true;const emphasis=[...new Set((q.q.match(/必ず|常に|絶対に|すべて|一切|のみ|限り|原則|例外|場合|とき|第三者|善意|無過失|重大な過失|ただし|それでも|さらに/g)||[]))];const emph=emphasis.length?'気になる表現：「'+emphasis.slice(0,6).join('」「')+'」':'例外を見落としていないか確認しよう。';hintText.textContent='🔎 この問題の注目ポイント\n'+practiceHint(q)+'\n\n① 誰の権利や行為？（主語）\n② 何が前提？（条件）\n③ どの例外がある？\n④ 結論は言い切れる？\n'+emph;hintButton.onclick=()=>{hintText.hidden=!hintText.hidden;hintButton.setAttribute('aria-expanded',String(!hintText.hidden));hintButton.textContent=hintText.hidden?'💡 ヒントを見る（答えは表示しない）':'💡 ヒントをしまう'};hintWrap.append(hintButton,hintText);$('panel').append(hintWrap);
+btn('⭕ 正しい',()=>dojoJudge(q,true));btn('❌ 誤り',()=>dojoJudge(q,false));btn('📚 根拠条文',()=>lawLibrary(String(q.law)));btn('🥋 道場メニュー',dojo)}
+function dojoJudge(q,choice){const ok=choice===q.a;s.dojo=s.dojo||{};const prev=s.dojo[q.id]||{attempts:0,correctCount:0};s.dojo[q.id]={attempts:prev.attempts+1,correctCount:prev.correctCount+(ok?1:0),correct:ok,reason:''};const attempt=rememberAnswer(q,choice,'dojo');attempt.difficulty=practiceLevel(q);save(false);panel(ok?'✨ 正解！':'📕 ここを復習しよう','【'+levelTitle(practiceLevel(q))+'】 '+q.why);let p=document.createElement('p');p.textContent='正解：'+(q.a?'⭕ 正しい':'❌ 誤り')+' ／ あなたの回答：'+(choice?'⭕ 正しい':'❌ 誤り');$('panel').append(p);if(!ok)reasonButtons(q,attempt,'dojo');btn('📚 民法第'+q.law+'条',()=>lawLibrary(String(q.law)));btn('🔄 この問題を再挑戦',()=>dojoSingle(q));btn('次の問題 →',()=>{dojoIndex++;dojoQuestion()});btn('道場メニュー',dojo)}
+function dojoSingle(q){dojoDifficulty=practiceLevel(q);dojoChapter=q.chapter;dojoWrongOnly=false;dojoSession=[q];dojoIndex=0;dojoQuestion()}
+function dojoEnd(){const a=allPracticeItems.filter(q=>q.level===dojoDifficulty&&(!dojoChapter||q.chapter===dojoChapter));let checked=a.filter(q=>s.dojo?.[q.id]);let right=checked.filter(q=>s.dojo[q.id].correct);panel('🎉 '+levelTitle(dojoDifficulty)+' の一区切り','この級・範囲の直近正解：'+right.length+' / '+checked.length+'問。繰り返しだけで法律習熟度100％にはならないよ。');btn('間違えた問題を復習',()=>dojoStart(dojoChapter,true,dojoDifficulty));btn('道場メニュー',dojo);btn('📊 法律習熟度',mastery)}
 
 // Ver.0.7 HP boss challenge.  Existing dojo questions are reused, not new claims about the law.
 const bossConfig={
@@ -318,29 +405,34 @@ const bossConfig={
   5:{icon:'🦊',name:'代理の影法師',story:'本人・代理人・相手方の関係を試す影。'}
 };
 const BOSS_HP=4,HERO_HP=3;
-let bossRun=null;
-function bossStored(c){s.bossRecords=s.bossRecords||{};return s.bossRecords[c]||{attempts:0,wins:0,best:0,latest:0}}
+let bossRun=null,bossDifficulty='standard';
+const bossPoolInfo={beginner:'基礎3問＋標準3問',standard:'標準6問',applied:'応用3問＋標準3問',oni:'鬼級3問＋応用3問'};
+function bossBucket(diff){if(diff==='standard')return s.bossRecords=s.bossRecords||{};s.bossDiffRecords=s.bossDiffRecords||{};return s.bossDiffRecords[diff]=s.bossDiffRecords[diff]||{}}
+function bossWrite(c,diff,record){bossBucket(diff)[c]=record}
+function bossStored(c,diff='standard'){return bossBucket(diff)[c]||{attempts:0,wins:0,best:0,latest:0}}
 function bossArena(){
  if(window.matchMedia('(orientation: portrait)').matches&&$('gameLayout').dataset.view!=='read')setView('read');
- panel('👑 章ボスの試練','正解でボスHPを1つ減らす、不正解でうさぎのHPが1つ減るよ。6問のうち4問正解すれば勝利！ ヒントはいつでも使える。時間制限・失点ペナルティなし。');
- let intro=document.createElement('p');intro.className='boss-mini';intro.textContent='第1〜5章の問題道場にある問題を使った新しい遊び方だよ。勝利した章の初回だけ＋50 EXP。途中のバトルは保存せず、勝敗の記録は保存するよ。';$('panel').append(intro);
+ panel('👑 章ボスの試練','難易度を選べるようになったよ！ 正解でボスHPを1つ減らし、不正解でうさぎHPが1つ減る。4問正解で勝利。時間制限・失点ペナルティなし。');
+ let modes=document.createElement('div');modes.className='boss-difficulty-grid';modes.setAttribute('aria-label','ボスの難易度');$('panel').append(modes);Object.entries(difficultyMeta).forEach(([key,item])=>{let b=btn(item.icon+' '+item.label,()=>{bossDifficulty=key;bossArena()},modes);b.setAttribute('aria-pressed',String(bossDifficulty===key))});
+ let intro=document.createElement('p');intro.className='boss-mini';intro.textContent='選択中：'+levelTitle(bossDifficulty)+'（'+bossPoolInfo[bossDifficulty]+'）。章ごとの初勝利だけ＋50 EXP、難易度を変えても追加EXPはないよ。途中のバトルは保存せず、勝敗は級ごとに記録するよ。';$('panel').append(intro);
  let list=document.createElement('div');list.className='boss-list';$('panel').append(list);
  [1,2,3,4,5].forEach(c=>{
-  let info=bossConfig[c],stats=bossStored(c),box=document.createElement('div');box.className='boss-card';
+  let info=bossConfig[c],stats=bossStored(c,bossDifficulty),box=document.createElement('div');box.className='boss-card';
   let h=document.createElement('strong');h.textContent=info.icon+' 第'+c+'章 '+info.name;box.append(h);
   let desc=document.createElement('p');desc.textContent=info.story;box.append(desc);
   let hist=document.createElement('p');hist.textContent=stats.wins?'🏆 勝利 '+stats.wins+'回 ／ 最高 '+stats.best+'/6問':'🔒 未撃破 ／ 挑戦 '+stats.attempts+'回';box.append(hist);
-  btn(stats.wins?'🔁 もう一度挑戦':'⚔️ 挑戦する',()=>bossStart(c),box);list.append(box)
+  btn(stats.wins?'🔁 もう一度挑戦':'⚔️ 挑戦する',()=>bossStart(c,bossDifficulty),box);list.append(box)
  });
  btn('🥋 問題道場で練習',dojo);btn('📕 弱点カルテ',()=>weak('misses'));
 }
-function bossStart(c){
- if(!bossConfig[c])return;
- const stats=bossStored(c);s.bossRecords[c]={...stats,attempts:stats.attempts+1};
- let questions=dojoItems.filter(q=>q.chapter===c);
- // Rotate the six questions between visits, without randomizing during a battle.
+function bossStart(c,diff=bossDifficulty){
+ if(!bossConfig[c]||!difficultyMeta[diff])return;
+ const stats=bossStored(c,diff);bossWrite(c,diff,{...stats,attempts:stats.attempts+1});
+ const get=(level)=>allPracticeItems.filter(q=>q.chapter===c&&q.level===level);
+ let questions=diff==='standard'?get('standard'):[...get(diff),...get(diff==='oni'?'applied':'standard')];
+ // Deterministic rotation of 6 distinct questions, no repetition in one battle.
  const offset=(stats.attempts%questions.length);questions=questions.slice(offset).concat(questions.slice(0,offset));
- bossRun={chapter:c,questions,index:0,heroHp:HERO_HP,bossHp:BOSS_HP,correct:0,answers:[],waiting:false,finished:false};
+ bossRun={chapter:c,difficulty:diff,questions,index:0,heroHp:HERO_HP,bossHp:BOSS_HP,correct:0,answers:[],waiting:false,finished:false};
  save(false);bossQuestion();
 }
 function bossHeader(){
@@ -355,9 +447,9 @@ function bossQuestion(){
  const run=bossRun;if(!run||run.finished){bossArena();return}
  if(run.index>=run.questions.length){bossEnd(false);return}
  run.waiting=false;const q=run.questions[run.index];
- panel('👑 第'+run.chapter+'章ボス　問'+(run.index+1)+' / '+run.questions.length,'💡 正解でボスに1ダメージ。間違っても解説を読んで復習できるよ。');
+ panel('👑 '+levelTitle(run.difficulty)+' 第'+run.chapter+'章　問'+(run.index+1)+' / '+run.questions.length,'💡 正解でボスに1ダメージ。間違っても解説を読んで復習できるよ。');
  bossHeader();let text=document.createElement('div');text.className='boss-question';text.textContent=q.q;$('panel').append(text);
- let details=document.createElement('details');details.className='boss-hint';let sum=document.createElement('summary');sum.textContent='💡 この問題のヒントを見る';let hint=document.createElement('p');hint.textContent=(dojoHintById[q.id]||'主語と条件を確認しよう。')+'\n主語 → 条件・例外 → 結論の順で読もう。';hint.style.whiteSpace='pre-wrap';details.append(sum,hint);$('panel').append(details);
+ let details=document.createElement('details');details.className='boss-hint';let sum=document.createElement('summary');sum.textContent='💡 この問題のヒントを見る';let hint=document.createElement('p');hint.textContent=practiceHint(q)+'\n主語 → 条件・例外 → 結論の順で読もう。';hint.style.whiteSpace='pre-wrap';details.append(sum,hint);$('panel').append(details);
  let buttons=document.createElement('div');buttons.className='boss-answer-buttons';$('panel').append(buttons);
  btn('⭕ 正しい',()=>bossJudge(true),buttons);btn('❌ 誤り',()=>bossJudge(false),buttons);
  btn('📚 民法第'+q.law+'条',()=>lawLibrary(String(q.law)));btn('👑 ボス一覧に戻る',bossArena);
@@ -367,7 +459,7 @@ function bossJudge(choice){
  run.waiting=true;const q=run.questions[run.index],ok=choice===q.a;
  if(ok){run.bossHp=Math.max(0,run.bossHp-1);run.correct++}else run.heroHp=Math.max(0,run.heroHp-1);
  const entry=rememberAnswer({...q,name:'👑 第'+run.chapter+'章ボス　問'+(run.index+1)},choice,'boss');
- run.answers.push({qid:q.id,ok});save(false);
+ entry.difficulty=practiceLevel(q);run.answers.push({qid:q.id,ok});save(false);
  panel(ok?'✨ 正解！ ボスにダメージ！':'📕 復習して次へ','答え合わせをしよう。');bossHeader();
  let feedback=document.createElement('div');feedback.className='boss-feedback';
  let title=document.createElement('strong');title.textContent='問題 '+(run.index+1)+'：'+(ok?'⭕ 正解':'❌ 不正解');
@@ -385,15 +477,15 @@ function bossJudge(choice){
 }
 function bossEnd(won){
  const run=bossRun;if(!run||run.finished){bossArena();return}
- run.finished=true;const c=run.chapter,stats=bossStored(c),wasFirst=won&&!stats.wins;
- s.bossRecords[c]={...stats,wins:stats.wins+(won?1:0),best:Math.max(stats.best,run.correct),latest:run.correct,lastWin:won};
+ run.finished=true;const c=run.chapter,stats=bossStored(c,run.difficulty);const allWins=bossStored(c,'standard').wins>0||['beginner','applied','oni'].some(d=>bossStored(c,d).wins>0);const wasFirst=won&&!allWins;
+ bossWrite(c,run.difficulty,{...stats,wins:stats.wins+(won?1:0),best:Math.max(stats.best,run.correct),latest:run.correct,lastWin:won});
  save(false);
  const gained=wasFirst?rewardOnce('boss-v07-chapter-'+c,50):0;
- panel(won?'🏆 第'+c+'章ボスに勝利！':'🌱 第'+c+'章ボス、今回はここまで',won?'4問以上の正解で勝利！ 法律の読み方が磨かれたね。':'間違えた問題も記録されたよ。解説を見て、道場で復習できるよ。');
+ panel(won?'🏆 第'+c+'章ボスに勝利！':'🌱 第'+c+'章ボス、今回はここまで',won?'4問正解で勝利！ 法律の読み方が磨かれたね。':'間違えた問題も記録されたよ。解説を見て、道場で復習できるよ。');
  let summary=document.createElement('div');summary.className='boss-outcome';summary.textContent=(won?'🏆 勝利！':'📖 学びを持ち帰ろう')+'　正解 '+run.correct+'/'+run.answers.length+'問'+(gained?'　＋'+gained+' EXP':'');$('panel').append(summary);
- let statsLine=document.createElement('p');statsLine.className='boss-mini';statsLine.textContent='章ボスの勝利数：'+s.bossRecords[c].wins+'回 ／ 最高正解数：'+s.bossRecords[c].best+'問';$('panel').append(statsLine);
- const wrong=run.answers.filter(a=>!a.ok);if(wrong.length){let h=document.createElement('h3');h.textContent='📕 今回の復習ポイント';$('panel').append(h);wrong.forEach(a=>{const q=dojoItems.find(x=>x.id===a.qid);if(!q)return;let d=document.createElement('div');d.className='boss-feedback';let p=document.createElement('p');p.textContent=q.q;let d2=document.createElement('p');d2.textContent='→ '+q.why;d.append(p,d2);btn('この問題を道場で復習',()=>dojoSingle(q),d);$('panel').append(d)})}
- btn('⚔️ もう一度挑戦',()=>bossStart(c));btn('👑 別の章のボスへ',bossArena);btn('📕 間違えた問題の記録',()=>weak('misses'));btn('🪞 別表現問題',altPractice);btn('📖 冒険の記録',record);
+ let statsLine=document.createElement('p');statsLine.className='boss-mini';statsLine.textContent=levelTitle(run.difficulty)+' 勝利：'+bossStored(c,run.difficulty).wins+'回 ／ 最高 '+bossStored(c,run.difficulty).best+'問';$('panel').append(statsLine);
+ const wrong=run.answers.filter(a=>!a.ok);if(wrong.length){let h=document.createElement('h3');h.textContent='📕 今回の復習ポイント';$('panel').append(h);wrong.forEach(a=>{const q=allPracticeItems.find(x=>x.id===a.qid);if(!q)return;let d=document.createElement('div');d.className='boss-feedback';let p=document.createElement('p');p.textContent=q.q;let d2=document.createElement('p');d2.textContent='→ '+q.why;d.append(p,d2);btn('この問題を道場で復習',()=>dojoSingle(q),d);$('panel').append(d)})}
+ btn('⚔️ もう一度挑戦',()=>bossStart(c,run.difficulty));btn('👑 別の章のボスへ',bossArena);btn('📕 間違えた問題の記録',()=>weak('misses'));btn('🪞 別表現問題',altPractice);btn('📖 冒険の記録',record);
 }
 
 const sizeSelect=$('mapSize');try{const v=localStorage.getItem('usagi-map-size');if(['small','medium','large'].includes(v))sizeSelect.value=v}catch(e){}function setMapSize(){ $('mapSide').dataset.size=sizeSelect.value;try{localStorage.setItem('usagi-map-size',sizeSelect.value)}catch(e){}}sizeSelect.addEventListener('change',setMapSize);setMapSize();showChapters();
