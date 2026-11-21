@@ -30,7 +30,21 @@ main{padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-
 /* Ver.0.6.6: visible alternate-question entry and per-attempt weakness detail. */
 @media (orientation:portrait){.study-side #panel{max-height:none!important;overflow:visible!important;overscroll-behavior:auto}}
 .practice-nav,.weak-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0}.practice-nav button,.weak-nav button{margin:0!important;min-width:0;min-height:42px;font-size:14px}.practice-nav button[aria-pressed=true],.weak-nav button[aria-pressed=true]{background:#b9cba0;outline:2px solid #668653}.weak-card,.practice-card{background:#fff9ea;border:1px solid #d8cbaa;border-radius:10px;padding:11px;margin:10px 0}.weak-card summary{line-height:1.6}.weak-card p,.practice-card p{margin:6px 0}.weak-miss{border-left:4px solid #ae8274;background:#fff4e5;padding:10px;border-radius:7px;margin:8px 0}.weak-miss p{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}.weak-kind{font-weight:700;color:#5d466b}.weak-note{color:#615746;font-size:13px;line-height:1.5}.weak-card button,.weak-miss button,.practice-card button{min-height:40px}.practice-card .weak-note{margin-top:3px}
-</style><main><header class="game-header"><h1>🐰 うさぎ村の法律冒険記</h1><span>Ver.0.6.6</span></header><div class="stats"><span id="lv"></span><span id="exp"></span><span id="progress"></span></div><section id="chapters" class="chapter-list"></section><section id="adventure" hidden><div class="chapter-heading"><h2 id="chapterTitle"></h2><button class="chapter-back" onclick="showChapters()">← 章選択</button></div><nav class="view-switch" aria-label="画面表示"><button type="button" data-view="both" onclick="setView('both')">🐰 通常</button><button type="button" data-view="map" onclick="setView('map')">🗺️ 探索のみ</button><button type="button" data-view="read" onclick="setView('read')">📖 読書モード</button></nav><div class="game-layout" id="gameLayout" data-view="both"><div class="map-side" id="mapSide"><label class="map-size">マップの大きさ <select id="mapSize"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><div id="map"></div><div class="map-actions"><div class="controls"><span></span><button onclick="move(0,-1)">↑</button><span></span><button onclick="move(-1,0)">←</button><button onclick="move(0,1)">↓</button><button onclick="move(1,0)">→</button></div><div class="talk-slot"><button id="talkAction" hidden onclick="talk()">💬 話す</button></div></div><div id="npcChoices" class="npc-choice"></div><div id="status" role="status"></div><p class="map-help">住民の隣で話そう。木・川・建物・噴水は通れないよ。</p></div><div class="study-side"><button id="menuToggle" class="menu-toggle" type="button" aria-expanded="true" onclick="toggleStudyMenu()">▲ 学習メニューをしまう</button><div class="menu" id="studyMenu"><button onclick="openDictionary()">🔮 辞典</button><button onclick="lawLibrary()">📚 民法条文</button><button onclick="training()">🪶 読解修行</button><button onclick="school()">🏫 学校</button><button onclick="dojo()">🥋 問題道場</button><button onclick="altPractice()">🪞 別表現問題</button><button onclick="weak()">📕 弱点</button><button onclick="record()">📖 記録</button><button onclick="save(true)">💾 セーブ</button></div><section class="panel" id="panel"></section></div></div></section></main><script>
+
+/* Ver.0.7: an original, non-timed RPG battle. */
+.boss-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:9px;margin:14px 0}
+.boss-card{background:#ede2c7;border:1px solid #c3b697;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.boss-card strong{font-size:17px}.boss-card p{margin:1px 0;font-size:13px}.boss-card button{background:#455f4b;color:white;margin:0!important;font-weight:bold}
+.boss-stage{background:linear-gradient(145deg,#29394c,#4d3e63 70%,#665a69);color:#fff6dc;border-radius:14px;padding:13px;margin:12px 0;overflow:hidden}
+.boss-fighters{display:flex;align-items:center;justify-content:space-around;gap:12px;margin-bottom:8px;text-align:center}.boss-avatar{font-size:clamp(36px,9vw,60px);line-height:1.5}.boss-fighter-label{font-size:12px}
+.boss-vs{font-size:19px;font-weight:900;color:#ffdf8a;letter-spacing:3px}.boss-hp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.boss-hp-label{font-size:12px;margin:0 0 5px}
+.boss-hp-track{height:14px;background:#26303b;border-radius:999px;overflow:hidden;border:1px solid #d1caaf}.boss-hp-fill{height:100%;transition:width .25s;background:#8dc6a4}.boss-hp-fill.enemy{background:#e7a37a}.boss-hearts{font-size:15px;letter-spacing:2px;margin-top:4px}
+.boss-question{background:#fffaf0;border:2px solid #b79b69;border-radius:11px;padding:14px;margin:10px 0;font-size:17px;line-height:1.8}
+.boss-hint{background:#e8dcc0;border-radius:9px;padding:10px;margin:8px 0;white-space:pre-wrap}.boss-feedback{background:#fff7e6;border-left:5px solid #b59b5f;border-radius:9px;padding:13px;line-height:1.7}.boss-feedback p{margin:8px 0}
+.boss-answer-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.boss-answer-buttons button{margin:0!important;padding:13px 5px;min-height:50px;font-weight:bold;background:#e9dcc2}
+.boss-mini{font-size:13px;color:#5e574c}.boss-outcome{font-size:21px;font-weight:bold;text-align:center;background:#e8dec3;border-radius:10px;padding:14px;margin:10px 0}
+@media(max-width:410px){.boss-list{grid-template-columns:1fr}.boss-stage{padding:10px}.boss-fighters{gap:7px}}
+</style><main><header class="game-header"><h1>🐰 うさぎ村の法律冒険記</h1><span>Ver.0.7</span></header><div class="stats"><span id="lv"></span><span id="exp"></span><span id="progress"></span></div><section id="chapters" class="chapter-list"></section><section id="adventure" hidden><div class="chapter-heading"><h2 id="chapterTitle"></h2><button class="chapter-back" onclick="showChapters()">← 章選択</button></div><nav class="view-switch" aria-label="画面表示"><button type="button" data-view="both" onclick="setView('both')">🐰 通常</button><button type="button" data-view="map" onclick="setView('map')">🗺️ 探索のみ</button><button type="button" data-view="read" onclick="setView('read')">📖 読書モード</button></nav><div class="game-layout" id="gameLayout" data-view="both"><div class="map-side" id="mapSide"><label class="map-size">マップの大きさ <select id="mapSize"><option value="small">小</option><option value="medium" selected>中</option><option value="large">大</option></select></label><div id="map"></div><div class="map-actions"><div class="controls"><span></span><button onclick="move(0,-1)">↑</button><span></span><button onclick="move(-1,0)">←</button><button onclick="move(0,1)">↓</button><button onclick="move(1,0)">→</button></div><div class="talk-slot"><button id="talkAction" hidden onclick="talk()">💬 話す</button></div></div><div id="npcChoices" class="npc-choice"></div><div id="status" role="status"></div><p class="map-help">住民の隣で話そう。木・川・建物・噴水は通れないよ。</p></div><div class="study-side"><button id="menuToggle" class="menu-toggle" type="button" aria-expanded="true" onclick="toggleStudyMenu()">▲ 学習メニューをしまう</button><div class="menu" id="studyMenu"><button onclick="openDictionary()">🔮 辞典</button><button onclick="lawLibrary()">📚 民法条文</button><button onclick="training()">🪶 読解修行</button><button onclick="school()">🏫 学校</button><button onclick="dojo()">🥋 問題道場</button><button onclick="bossArena()">👑 ボス戦</button><button onclick="altPractice()">🪞 別表現問題</button><button onclick="weak()">📕 弱点</button><button onclick="record()">📖 記録</button><button onclick="save(true)">💾 セーブ</button></div><section class="panel" id="panel"></section></div></div></section></main><script>
 const $=id=>document.getElementById(id);const key='usagi-rpg-v2';let s={x:5,y:5,exp:0,cleared:[]};try{let a=localStorage.getItem(key);if(a){let b=JSON.parse(a);if(Array.isArray(b.cleared)&&Number.isInteger(b.x)&&Number.isInteger(b.y)&&b.x>=0&&b.x<15&&b.y>=0&&b.y<11)s=b}else{let old=JSON.parse(localStorage.getItem('usagi-rpg-v1')||'null');if(old){s.exp=Number(old.exp)||0;s.cleared=(old.cleared||[]).filter(v=>[2,6,8,17].includes(v));}}}catch(e){}
 const Q=[
 {id:6,x:2,y:2,name:'🐻 くまさん',story:'キツネさんがぼくの許可なく土地の契約を結んだんだ。ぼくはまだ認めていないよ。',q:'本人が追認しない限り、無権代理行為の効力は本人に帰属しない。',easy:'本人があとから認めなければ、無権代理の契約の効果は本人に生じない。',parts:['条件：本人が追認しない限り','主語：無権代理行為の効力','結論：本人に帰属しない'],a:true,why:'民法113条。本人の意思を守るため、権限のない人が勝手に結んだ契約は原則として本人を拘束しない。'},
@@ -52,13 +66,13 @@ function record(tab='summary'){
  if(tab==='summary'){
  let d=document.createElement('div');d.className='home-stats';d.innerHTML='<strong>🐰 Lv.'+levelNow()+' '+titleNow()+'</strong><p>⭐ '+s.exp+' EXP ／ 次のLvまで '+(60-s.exp%60)+' EXP</p><div class="home-bar"><span style="width:'+(s.exp%60/60*100)+'%"></span></div>';root.append(d);
  let g=document.createElement('div');g.className='record-grid';root.append(g);
- [['クリア済み',s.cleared.filter(id=>Q.some(q=>q.id===id)).length+'/'+Q.length],['開放済みの章','5章'],['獲得可能な装備',gear.filter(a=>levelNow()>=a[0]).length+'/'+gear.length],['収録条文',lawRows.length+'条']].forEach(([name,value])=>{let x=document.createElement('div');x.className='record-tile';let l=document.createElement('small');l.textContent=name;let v=document.createElement('strong');v.textContent=value;x.append(l,v);g.append(x)});
+ [['クリア済み',s.cleared.filter(id=>Q.some(q=>q.id===id)).length+'/'+Q.length],['開放済みの章','5章'],['獲得可能な装備',gear.filter(a=>levelNow()>=a[0]).length+'/'+gear.length],['収録条文',lawRows.length+'条'],['章ボス撃破',Object.values(s.bossRecords||{}).filter(v=>v.wins>0).length+'/5体']].forEach(([name,value])=>{let x=document.createElement('div');x.className='record-tile';let l=document.createElement('small');l.textContent=name;let v=document.createElement('strong');v.textContent=value;x.append(l,v);g.append(x)});
  }else{
  for(let c of [1,2,3,4,5]){let h=document.createElement('h3');h.textContent=chapters.find(x=>x.id===c).title;root.append(h);let g=document.createElement('div');g.className='record-grid';root.append(g);Q.filter(q=>chapterOf(q)===c).forEach(q=>{let d=document.createElement('div');d.className='record-tile';let n=document.createElement('strong');n.textContent=q.name;let t=document.createElement('small');t.textContent=s.cleared.includes(q.id)?'✓ クリア済み':'□ 未クリア';d.append(n,t);g.append(d)})}
  }btn('探索へ',home);
 }
 function recordNav(active){let root=$('panel'),nav=document.createElement('div');nav.className='record-nav';nav.setAttribute('aria-label','冒険の記録メニュー');[['summary','📊 総合記録'],['equipment','🎒 称号・装備'],['mastery','📚 法律習熟度'],['quest','📜 クエスト履歴']].forEach(([k,t])=>{let b=btn(t,()=>record(k),nav);b.setAttribute('aria-pressed',String(k===active))});root.insertBefore(nav,root.children[1]||null);root.scrollTop=0;}
-function home(){panel('🪽 ルミィ','森の住民を訪ねて法律語を学ぼう。辞典と羽ペンはいつでも使えるよ。');let a=activeQ(),n=a.filter(q=>s.cleared.includes(q.id)).length;let d=document.createElement('div');d.className='home-stats';let level=1+Math.floor(s.exp/60);d.innerHTML='<strong>🐰 Lv.'+level+'　'+titleNow()+'</strong><p>⭐ '+s.exp+' EXP　次のLvまで '+(60-s.exp%60)+' EXP</p><div class="home-bar"><span style="width:'+(s.exp%60/60*100)+'%"></span></div><p>📜 この章の進行 '+n+'/'+a.length+'</p><div class="home-bar"><span style="width:'+(a.length?n/a.length*100:0)+'%"></span></div>'; $('panel').append(d);btn('🏫 法律魔法学校',school);btn('🎒 称号・装備',growth);btn('📊 法律習熟度',mastery);btn('🥋 法律問題道場',dojo);btn('🪞 別表現問題',altPractice)}document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;let d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(d){e.preventDefault();move(...d)}});
+function home(){panel('🪽 ルミィ','森の住民を訪ねて法律語を学ぼう。辞典と羽ペンはいつでも使えるよ。');let a=activeQ(),n=a.filter(q=>s.cleared.includes(q.id)).length;let d=document.createElement('div');d.className='home-stats';let level=1+Math.floor(s.exp/60);d.innerHTML='<strong>🐰 Lv.'+level+'　'+titleNow()+'</strong><p>⭐ '+s.exp+' EXP　次のLvまで '+(60-s.exp%60)+' EXP</p><div class="home-bar"><span style="width:'+(s.exp%60/60*100)+'%"></span></div><p>📜 この章の進行 '+n+'/'+a.length+'</p><div class="home-bar"><span style="width:'+(a.length?n/a.length*100:0)+'%"></span></div>'; $('panel').append(d);btn('🏫 法律魔法学校',school);btn('🎒 称号・装備',growth);btn('📊 法律習熟度',mastery);btn('🥋 法律問題道場',dojo);btn('🪞 別表現問題',altPractice);btn('👑 HP付きボス戦',bossArena)}document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;let d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(d){e.preventDefault();move(...d)}});
 s.study=s.study||{};s.boss=s.boss||false;
 const lessons={6:['代理とは、本人のために代理人が意思表示をする仕組み。','権限がないキツネが勝手に契約しても、くま本人は原則として拘束されない。本人の意思を守るためだよ。','本人が追認すれば原則として契約時にさかのぼる。ただし第三者の権利を害せない（116条）。'],8:['相手方は契約が有効か分からず困っている。','114条：相当の期間を定めて本人に確答を催告できる。相手方の善意・悪意は問わない。期間内に確答がなければ追認拒絶とみなす。','115条：契約時に代理権がないことを知らなかった相手方は、本人の追認前なら取消しができる。無過失までは不要。'],17:['善意とは事情を知らないこと。悪意とは知っていること。','無過失とは必要な注意を尽くしたこと。善意でも確認不足なら過失がある場合がある。','制度によって善意だけで足りる場合と無過失も必要な場合がある。条件を別々に読むこと。'],2:['本人が無権代理人を単独相続した場合、本人は追認を拒絶できる。','ただし無権代理人が117条の責任を負っていたなら、その責任を相続することがある。','逆に無権代理人が本人を単独相続した場合、追認拒絶などが先にないときは原則として追認拒絶できない。']};
 const R=[
@@ -67,15 +81,15 @@ const R=[
 {id:117,base:17,name:'先生・復習',q:'善意であることは、直ちに無過失であることを意味しない。',easy:'知らなかったからといって、必ず注意不足がなかったとはいえない。',parts:['主語：善意であること','結論：無過失を直ちに意味しない'],a:true,why:'善意と無過失は別々の条件。'},
 {id:102,base:2,name:'図書館・復習',q:'本人が無権代理人を単独相続した場合、追認を拒絶できることと117条の責任を承継することは両立し得る。',easy:'本人が契約を認めなくても、無権代理人が負っていた責任を引き継ぐ場合がある。',parts:['条件：本人が無権代理人を単独相続','結論：追認拒絶と責任承継は両立し得る'],a:true,why:'追認による契約の効力と、相続による責任の承継は別問題。'}];
 function lesson(q){panel('📖 '+q.name+' のミニ講義',q.story);(lessons[q.id]||[]).forEach((t,i)=>{let d=document.createElement('p');d.textContent=(i+1)+'．'+t;$('panel').append(d)});btn('演習へ',()=>{rewardOnce('lesson-'+q.id,10);quiz(q)});btn('学校へ',school)}
-function school(){panel('🏫 法律魔法学校','単元を選ぼう。講義 → 演習 → 復習。');['契約のはじまり','意思表示の庭','真意を探す洞窟','守られし者の学び舎','代理・無権代理'].forEach((name,i)=>{let h=document.createElement('h3');h.textContent=name;$('panel').append(h);Q.filter(q=>chapterOf(q)===[1,2,3,4,5][i]).forEach(q=>btn(q.name+' の授業',()=>lesson(q)))});btn('🪶 読解修行',training);btn('📕 弱点復習',weak);btn('📊 法律習熟度',mastery);btn('⚔️ ボス戦（個数問題）',boss);btn('🥋 法律問題道場（追加30問）',dojo);btn('🪞 別表現問題',altPractice)}
+function school(){panel('🏫 法律魔法学校','単元を選ぼう。講義 → 演習 → 復習。');['契約のはじまり','意思表示の庭','真意を探す洞窟','守られし者の学び舎','代理・無権代理'].forEach((name,i)=>{let h=document.createElement('h3');h.textContent=name;$('panel').append(h);Q.filter(q=>chapterOf(q)===[1,2,3,4,5][i]).forEach(q=>btn(q.name+' の授業',()=>lesson(q)))});btn('🪶 読解修行',training);btn('📕 弱点復習',weak);btn('📊 法律習熟度',mastery);btn('🧩 個数問題の試練',boss);btn('👑 HP付きボス戦',bossArena);btn('🥋 法律問題道場（追加30問）',dojo);btn('🪞 別表現問題',altPractice)}
 // Only new answers can be connected to an exact prompt, chosen answer and self-reported mistake cause.
 // Preserve legacy aggregates and keep a bounded local history (latest 250 answers).
 function rememberAnswer(q,choice,kind){
  s.answerHistory=Array.isArray(s.answerHistory)?s.answerHistory:[];
  s.answerSeq=(Number(s.answerSeq)||0)+1;
- const base=q.base||q.id,chapterId=kind==='dojo'?q.chapter:chapterOf(Q.find(x=>x.id===base)||q);
+ const base=q.base||q.id,chapterId=(kind==='dojo'||kind==='boss')?q.chapter:chapterOf(Q.find(x=>x.id===base)||q);
  const entry={id:s.answerSeq,time:Date.now(),kind,base,qid:q.id,chapter:chapterId,
-   title:q.name||(kind==='dojo'?'問題道場 第'+q.id+'問':'問題'),prompt:q.q,
+   title:q.name||(kind==='dojo'?'問題道場 第'+q.id+'問':kind==='boss'?'章ボス戦 第'+q.chapter+'章':'問題'),prompt:q.q,
    selected:choice,answer:q.a,correct:choice===q.a,why:q.why||'',reason:''};
  s.answerHistory.push(entry);
  if(s.answerHistory.length>250)s.answerHistory.splice(0,s.answerHistory.length-250);
@@ -102,15 +116,15 @@ function reasonButtons(q,entry,source='study'){
 function yn(v){return v?'⭕ 正しい':'❌ 誤り'}
 function weakMistakeDetail(a,into){
  let d=document.createElement('div');d.className='weak-miss';
- let h=document.createElement('div');h.className='weak-kind';h.textContent=(a.kind==='alternate'?'🪞 別表現':a.kind==='dojo'?'🥋 道場':'📘 基本')+' ／ '+a.title;d.append(h);
+ let h=document.createElement('div');h.className='weak-kind';h.textContent=(a.kind==='alternate'?'🪞 別表現':a.kind==='dojo'?'🥋 道場':a.kind==='boss'?'👑 ボス戦':'📘 基本')+' ／ '+a.title;d.append(h);
  let q=document.createElement('p');q.textContent='問題：'+a.prompt;d.append(q);
  let p=document.createElement('p');p.textContent='あなた：'+yn(a.selected)+'　正解：'+yn(a.answer);d.append(p);
  let r=document.createElement('p');r.textContent='原因：'+(a.reason||'未記録（後から選択できるよ）');d.append(r);
  let exp=document.createElement('p');exp.className='weak-note';exp.textContent='解説：'+(a.why||'');d.append(exp);
  if(a.time){let time=document.createElement('p');time.className='weak-note';time.textContent=new Date(a.time).toLocaleString('ja-JP');d.append(time)}
- if(!a.reason){let row=document.createElement('div');d.append(row);['知識不足','🐬 想起ミス','読解ミス','まだ分からない'].forEach(t=>btn(t,()=>{a.reason=t;r.textContent='原因：'+t;if(a.kind==='dojo'&&s.dojo?.[a.qid])s.dojo[a.qid].reason=t;else if(s.study?.[a.base])s.study[a.base].reason=t;save(false);row.replaceChildren()},row))}
- let original=a.kind==='dojo'?dojoItems.find(x=>x.id===a.qid):a.kind==='alternate'?R.find(x=>x.id===a.qid&&x.base===a.base):Q.find(x=>x.id===a.qid);
- if(original)btn('🔄 この問題を再挑戦',()=>{if(a.kind==='dojo')dojoSingle(original);else if(a.kind==='alternate')review(original);else quiz(original)},d);
+ if(!a.reason){let row=document.createElement('div');d.append(row);['知識不足','🐬 想起ミス','読解ミス','まだ分からない'].forEach(t=>btn(t,()=>{a.reason=t;r.textContent='原因：'+t;if(a.kind==='dojo'&&s.dojo?.[a.qid])s.dojo[a.qid].reason=t;else if(a.kind==='boss'){}else if(s.study?.[a.base])s.study[a.base].reason=t;save(false);row.replaceChildren()},row))}
+ let original=(a.kind==='dojo'||a.kind==='boss')?dojoItems.find(x=>x.id===a.qid):a.kind==='alternate'?R.find(x=>x.id===a.qid&&x.base===a.base):Q.find(x=>x.id===a.qid);
+ if(original)btn('🔄 この問題を再挑戦',()=>{if(a.kind==='dojo'||a.kind==='boss')dojoSingle(original);else if(a.kind==='alternate')review(original);else quiz(original)},d);
  into.append(d);
 }
 function weak(tab='topics'){
@@ -122,7 +136,7 @@ function weak(tab='topics'){
   for(const c of [1,2,3,4,5]){
    let h=document.createElement('h3');h.textContent=chapters.find(x=>x.id===c).title;$('panel').append(h);
    for(const q of Q.filter(x=>chapterOf(x)===c)){
-    const v=s.study[q.id],r=R.find(x=>x.base===q.id),events=(s.answerHistory||[]).filter(x=>x.base===q.id&&!x.correct);
+    const v=s.study[q.id],r=R.find(x=>x.base===q.id),events=(s.answerHistory||[]).filter(x=>x.base===q.id&&!x.correct&&x.kind!=='boss');
     let d=document.createElement('details');d.className='weak-card';
     let sum=document.createElement('summary');sum.textContent=q.name+'：'+(v?v.right+'/'+v.total+' 正解'+(v.pending?' ／ 要復習':''):'未集計')+'　▶ 内訳を見る';d.append(sum);
     let p=document.createElement('p');p.className='weak-note';p.textContent='📘 基本問題と🪞 別表現問題の回答を合わせた集計';d.append(p);
@@ -280,7 +294,7 @@ const dojoItems=[
 let dojoChapter=0,dojoIndex=0,dojoWrongOnly=false,dojoSession=[];
 function dojo(){s.dojo=s.dojo||{};panel('🥋 法律問題道場','全30問のオリジナル○×演習。第1〜5章の問題を収録。何度でも練習できるよ。道場の正誤は別記録で、既存の習熟度や経験値は変えないよ。');
 let answered=dojoItems.filter(q=>s.dojo[q.id]),right=answered.filter(q=>s.dojo[q.id].correct);let p=document.createElement('p');p.textContent='挑戦済み '+answered.length+'/30問 ／ 直近正解 '+right.length+'問 ／ 要復習 '+(answered.length-right.length)+'問';$('panel').append(p);
-btn('🌈 全章ミックス',()=>dojoStart(0,false));[1,2,3,4,5].forEach(c=>{let count=dojoItems.filter(q=>q.chapter===c).length;btn(chapters.find(x=>x.id===c).title+'（'+count+'問）',()=>dojoStart(c,false))});btn('📕 間違えた問題だけ',()=>dojoStart(0,true));btn('🔎 間違いの詳細を確認',()=>weak('misses'));btn('🏫 学校へ',school)}
+btn('🌈 全章ミックス',()=>dojoStart(0,false));[1,2,3,4,5].forEach(c=>{let count=dojoItems.filter(q=>q.chapter===c).length;btn(chapters.find(x=>x.id===c).title+'（'+count+'問）',()=>dojoStart(c,false))});btn('📕 間違えた問題だけ',()=>dojoStart(0,true));btn('🔎 間違いの詳細を確認',()=>weak('misses'));btn('👑 HP付きボス戦',bossArena);btn('🏫 学校へ',school)}
 function dojoStart(c,wrong){dojoChapter=c;dojoWrongOnly=wrong;dojoIndex=0;dojoSession=dojoItems.filter(q=>(!c||q.chapter===c)&&(!wrong||s.dojo?.[q.id]?.correct===false));dojoQuestion()}
 function dojoPool(){return dojoSession}
 const dojoHintById={
@@ -293,6 +307,94 @@ function dojoQuestion(){const pool=dojoPool();if(!pool.length){panel('🥋 道�
 function dojoJudge(q,choice){const ok=choice===q.a;s.dojo=s.dojo||{};const prev=s.dojo[q.id]||{attempts:0,correctCount:0};s.dojo[q.id]={attempts:prev.attempts+1,correctCount:prev.correctCount+(ok?1:0),correct:ok,reason:''};const attempt=rememberAnswer(q,choice,'dojo');save(false);panel(ok?'✨ 正解！':'📕 ここを復習しよう',q.why);let p=document.createElement('p');p.textContent='正解：'+(q.a?'⭕ 正しい':'❌ 誤り')+' ／ あなたの回答：'+(choice?'⭕ 正しい':'❌ 誤り');$('panel').append(p);if(!ok)reasonButtons(q,attempt,'dojo');btn('📚 民法第'+q.law+'条',()=>lawLibrary(String(q.law)));btn('🔄 この問題を再挑戦',()=>{dojoChapter=q.chapter;dojoWrongOnly=false;dojoSession=dojoItems.filter(x=>x.chapter===q.chapter);dojoIndex=dojoSession.findIndex(x=>x.id===q.id);dojoQuestion()});btn('次の問題 →',()=>{dojoIndex++;dojoQuestion()});btn('道場メニュー',dojo)}
 function dojoSingle(q){dojoChapter=q.chapter;dojoWrongOnly=false;dojoSession=[q];dojoIndex=0;dojoQuestion()}
 function dojoEnd(){const a=dojoItems.filter(q=>(!dojoChapter||q.chapter===dojoChapter));let checked=a.filter(q=>s.dojo?.[q.id]);let right=checked.filter(q=>s.dojo[q.id].correct);panel('🎉 道場の一区切り','この範囲の直近正解：'+right.length+' / '+checked.length+'問。繰り返しだけで習熟度100%にはならないよ。');btn('間違えた問題を復習',()=>dojoStart(dojoChapter,true));btn('道場メニュー',dojo);btn('📊 法律習熟度',mastery)}
+
+
+// Ver.0.7 HP boss challenge.  Existing dojo questions are reused, not new claims about the law.
+const bossConfig={
+  1:{icon:'📜',name:'契約の番人',story:'契約のルールが書かれた石板を守る番人。'},
+  2:{icon:'🪞',name:'鏡の幻影',story:'本心と表示の違いを映し出す、不思議な鏡。'},
+  3:{icon:'🐉',name:'錯誤の結晶竜',story:'思い込みを見抜くと、洞窟の結晶が輝く。'},
+  4:{icon:'🦉',name:'学び舎の試験官',story:'誰を、どんなときに守るのかを問う先生。'},
+  5:{icon:'🦊',name:'代理の影法師',story:'本人・代理人・相手方の関係を試す影。'}
+};
+const BOSS_HP=4,HERO_HP=3;
+let bossRun=null;
+function bossStored(c){s.bossRecords=s.bossRecords||{};return s.bossRecords[c]||{attempts:0,wins:0,best:0,latest:0}}
+function bossArena(){
+ if(window.matchMedia('(orientation: portrait)').matches&&$('gameLayout').dataset.view!=='read')setView('read');
+ panel('👑 章ボスの試練','正解でボスHPを1つ減らす、不正解でうさぎのHPが1つ減るよ。6問のうち4問正解すれば勝利！ ヒントはいつでも使える。時間制限・失点ペナルティなし。');
+ let intro=document.createElement('p');intro.className='boss-mini';intro.textContent='第1〜5章の問題道場にある問題を使った新しい遊び方だよ。勝利した章の初回だけ＋50 EXP。途中のバトルは保存せず、勝敗の記録は保存するよ。';$('panel').append(intro);
+ let list=document.createElement('div');list.className='boss-list';$('panel').append(list);
+ [1,2,3,4,5].forEach(c=>{
+  let info=bossConfig[c],stats=bossStored(c),box=document.createElement('div');box.className='boss-card';
+  let h=document.createElement('strong');h.textContent=info.icon+' 第'+c+'章 '+info.name;box.append(h);
+  let desc=document.createElement('p');desc.textContent=info.story;box.append(desc);
+  let hist=document.createElement('p');hist.textContent=stats.wins?'🏆 勝利 '+stats.wins+'回 ／ 最高 '+stats.best+'/6問':'🔒 未撃破 ／ 挑戦 '+stats.attempts+'回';box.append(hist);
+  btn(stats.wins?'🔁 もう一度挑戦':'⚔️ 挑戦する',()=>bossStart(c),box);list.append(box)
+ });
+ btn('🥋 問題道場で練習',dojo);btn('📕 弱点カルテ',()=>weak('misses'));
+}
+function bossStart(c){
+ if(!bossConfig[c])return;
+ const stats=bossStored(c);s.bossRecords[c]={...stats,attempts:stats.attempts+1};
+ let questions=dojoItems.filter(q=>q.chapter===c);
+ // Rotate the six questions between visits, without randomizing during a battle.
+ const offset=(stats.attempts%questions.length);questions=questions.slice(offset).concat(questions.slice(0,offset));
+ bossRun={chapter:c,questions,index:0,heroHp:HERO_HP,bossHp:BOSS_HP,correct:0,answers:[],waiting:false,finished:false};
+ save(false);bossQuestion();
+}
+function bossHeader(){
+ const run=bossRun,config=bossConfig[run.chapter];
+ let area=document.createElement('div');area.className='boss-stage';
+ const fighters=document.createElement('div');fighters.className='boss-fighters';
+ for(const [who,face] of [['🐰','冒険者'],[config.icon,config.name]]){let d=document.createElement('div');let emoji=document.createElement('div');emoji.className='boss-avatar';emoji.textContent=who;let label=document.createElement('div');label.className='boss-fighter-label';label.textContent=face;d.append(emoji,label);fighters.append(d);if(who==='🐰'){let versus=document.createElement('span');versus.className='boss-vs';versus.textContent='VS';fighters.append(versus)}}area.append(fighters);
+ const hpRow=document.createElement('div');hpRow.className='boss-hp-row';
+ for(const [title,remaining,max,isEnemy] of [['🐰 うさぎHP',run.heroHp,HERO_HP,false],['👑 ボスHP',run.bossHp,BOSS_HP,true]]){let group=document.createElement('div'),label=document.createElement('p');label.className='boss-hp-label';label.textContent=title+' '+remaining+'/'+max;let track=document.createElement('div');track.className='boss-hp-track';track.setAttribute('role','progressbar');track.setAttribute('aria-label',title);track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax',String(max));track.setAttribute('aria-valuenow',String(remaining));let fill=document.createElement('div');fill.className='boss-hp-fill'+(isEnemy?' enemy':'');fill.style.width=(remaining/max*100)+'%';track.append(fill);let hearts=document.createElement('div');hearts.className='boss-hearts';hearts.textContent='❤️'.repeat(remaining)+'♡'.repeat(max-remaining);group.append(label,track,hearts);hpRow.append(group)}area.append(hpRow);$('panel').append(area)
+}
+function bossQuestion(){
+ const run=bossRun;if(!run||run.finished){bossArena();return}
+ if(run.index>=run.questions.length){bossEnd(false);return}
+ run.waiting=false;const q=run.questions[run.index];
+ panel('👑 第'+run.chapter+'章ボス　問'+(run.index+1)+' / '+run.questions.length,'💡 正解でボスに1ダメージ。間違っても解説を読んで復習できるよ。');
+ bossHeader();let text=document.createElement('div');text.className='boss-question';text.textContent=q.q;$('panel').append(text);
+ let details=document.createElement('details');details.className='boss-hint';let sum=document.createElement('summary');sum.textContent='💡 この問題のヒントを見る';let hint=document.createElement('p');hint.textContent=(dojoHintById[q.id]||'主語と条件を確認しよう。')+'\n主語 → 条件・例外 → 結論の順で読もう。';hint.style.whiteSpace='pre-wrap';details.append(sum,hint);$('panel').append(details);
+ let buttons=document.createElement('div');buttons.className='boss-answer-buttons';$('panel').append(buttons);
+ btn('⭕ 正しい',()=>bossJudge(true),buttons);btn('❌ 誤り',()=>bossJudge(false),buttons);
+ btn('📚 民法第'+q.law+'条',()=>lawLibrary(String(q.law)));btn('👑 ボス一覧に戻る',bossArena);
+}
+function bossJudge(choice){
+ const run=bossRun;if(!run||run.finished||run.waiting)return;
+ run.waiting=true;const q=run.questions[run.index],ok=choice===q.a;
+ if(ok){run.bossHp=Math.max(0,run.bossHp-1);run.correct++}else run.heroHp=Math.max(0,run.heroHp-1);
+ const entry=rememberAnswer({...q,name:'👑 第'+run.chapter+'章ボス　問'+(run.index+1)},choice,'boss');
+ run.answers.push({qid:q.id,ok});save(false);
+ panel(ok?'✨ 正解！ ボスにダメージ！':'📕 復習して次へ','答え合わせをしよう。');bossHeader();
+ let feedback=document.createElement('div');feedback.className='boss-feedback';
+ let title=document.createElement('strong');title.textContent='問題 '+(run.index+1)+'：'+(ok?'⭕ 正解':'❌ 不正解');
+ let question=document.createElement('p');question.textContent=q.q;
+ let result=document.createElement('p');result.textContent='あなた：'+yn(choice)+' ／ 正解：'+yn(q.a);
+ let explain=document.createElement('p');explain.textContent='📖 '+q.why;feedback.append(title,question,result,explain);$('panel').append(feedback);
+ if(!ok){let heading=document.createElement('p');heading.textContent='間違えた原因を残そう（任意）';$('panel').append(heading);let causes=document.createElement('div');causes.className='boss-cause-buttons';$('panel').append(causes);
+  ['知識不足','🐬 想起ミス','読解ミス','まだ分からない'].forEach(label=>btn(label,()=>{entry.reason=label;heading.textContent='📌 記録：'+label+'（弱点カルテで確認できるよ）';causes.replaceChildren();save(false)},causes));
+ }
+ btn('📚 根拠条文を見る',()=>lawLibrary(String(q.law)));
+ const won=run.bossHp===0,done=won||run.heroHp===0||run.index===run.questions.length-1;
+ if(done){btn('🏁 '+(won?'勝利を確認':'今回の結果を見る'),()=>bossEnd(won))}
+ else{btn('次の問題 →',()=>{run.index++;bossQuestion()})}
+ btn('👑 ボス一覧へ',bossArena);
+}
+function bossEnd(won){
+ const run=bossRun;if(!run||run.finished){bossArena();return}
+ run.finished=true;const c=run.chapter,stats=bossStored(c),wasFirst=won&&!stats.wins;
+ s.bossRecords[c]={...stats,wins:stats.wins+(won?1:0),best:Math.max(stats.best,run.correct),latest:run.correct,lastWin:won};
+ save(false);
+ const gained=wasFirst?rewardOnce('boss-v07-chapter-'+c,50):0;
+ panel(won?'🏆 第'+c+'章ボスに勝利！':'🌱 第'+c+'章ボス、今回はここまで',won?'4問以上の正解で勝利！ 法律の読み方が磨かれたね。':'間違えた問題も記録されたよ。解説を見て、道場で復習できるよ。');
+ let summary=document.createElement('div');summary.className='boss-outcome';summary.textContent=(won?'🏆 勝利！':'📖 学びを持ち帰ろう')+'　正解 '+run.correct+'/'+run.answers.length+'問'+(gained?'　＋'+gained+' EXP':'');$('panel').append(summary);
+ let statsLine=document.createElement('p');statsLine.className='boss-mini';statsLine.textContent='章ボスの勝利数：'+s.bossRecords[c].wins+'回 ／ 最高正解数：'+s.bossRecords[c].best+'問';$('panel').append(statsLine);
+ const wrong=run.answers.filter(a=>!a.ok);if(wrong.length){let h=document.createElement('h3');h.textContent='📕 今回の復習ポイント';$('panel').append(h);wrong.forEach(a=>{const q=dojoItems.find(x=>x.id===a.qid);if(!q)return;let d=document.createElement('div');d.className='boss-feedback';let p=document.createElement('p');p.textContent=q.q;let d2=document.createElement('p');d2.textContent='→ '+q.why;d.append(p,d2);btn('この問題を道場で復習',()=>dojoSingle(q),d);$('panel').append(d)})}
+ btn('⚔️ もう一度挑戦',()=>bossStart(c));btn('👑 別の章のボスへ',bossArena);btn('📕 間違えた問題の記録',()=>weak('misses'));btn('🪞 別表現問題',altPractice);btn('📖 冒険の記録',record);
+}
 
 const sizeSelect=$('mapSize');try{const v=localStorage.getItem('usagi-map-size');if(['small','medium','large'].includes(v))sizeSelect.value=v}catch(e){}function setMapSize(){ $('mapSide').dataset.size=sizeSelect.value;try{localStorage.setItem('usagi-map-size',sizeSelect.value)}catch(e){}}sizeSelect.addEventListener('change',setMapSize);setMapSize();showChapters();
 
