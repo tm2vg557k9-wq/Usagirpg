@@ -1018,7 +1018,7 @@ render();
 (()=>{
 'use strict';
 // Ver.0.9.3: storybook title, illustrated B-style chapter cards, improved character proportions.
-const ver=document.querySelector('.game-header>span');if(ver)ver.textContent='Ver.0.9.3';
+const ver=document.querySelector('.game-header>span');if(ver)ver.textContent='Ver.0.9.4';
 const sheet=document.createElement('style');
 sheet.textContent=`
 /* Title and large illustrated chapter cards */
@@ -1045,7 +1045,7 @@ sheet.textContent=`
 .status-avatar svg,.wardrobe-figure svg,.tile .pixel-sprite{image-rendering:pixelated}
 .panel button .px-inline, .panel h2 .px-inline,.panel h3 .px-inline,.chapter-heading .px-inline{width:23px;height:23px;display:inline-flex;align-items:center;justify-content:center;margin-right:5px;vertical-align:-5px}
 .panel button .px-inline svg,.panel h2 .px-inline svg,.panel h3 .px-inline svg,.chapter-heading .px-inline svg{width:100%;height:100%;image-rendering:pixelated}
-.panel button .px-inline{width:18px;height:18px;vertical-align:-3px}
+.panel button .px-inline{width:31px;height:31px;vertical-align:-9px;margin-right:8px;flex:none}.panel button{line-height:1.4}.panel h2 .px-inline{width:34px;height:34px;vertical-align:-9px}.panel h3 .px-inline{width:30px;height:30px;vertical-align:-8px}@media(max-width:420px){.panel button .px-inline{width:28px;height:28px;margin-right:5px}}
 `;document.head.append(sheet);
 
 const rect=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
@@ -1110,11 +1110,11 @@ function face(kind){
  let z='';const E='#5b5057';
  if(kind==='bird'){
    z+=p(12,14,40,39,'#507f9c')+p(8,21,44,28,'#6da9cb')+p(17,14,29,13,'#9ad1e1')+p(13,33,17,14,'#497b9e')+p(33,35,11,10,'#b0d9eb');
-   z+=p(36,22,5,7,E)+p(39,23,1,2,'#fff')+p(48,31,12,7,'#e7b05f')+p(51,33,7,3,'#ffd782')+p(19,51,5,4,'#9c7451')+p(37,51,5,4,'#9c7451');
+   z+=p(14,11,10,9,'#95c8d9')+p(38,11,7,7,'#8ac4dc')+p(36,22,6,8,E)+p(39,23,2,2,'#fff')+p(48,29,15,10,'#dd9c3e')+p(53,32,10,4,'#ffe08c')+p(17,51,7,5,'#9c7451')+p(37,51,7,5,'#9c7451');
  }else if(kind==='owl'){
    z+=p(8,5,15,24,'#7d5d4a')+p(41,5,15,24,'#7d5d4a')+p(14,11,36,42,'#9a745e')+p(9,18,46,33,'#9a745e')+p(18,46,29,8,'#6b4d43');
    z+=p(15,24,16,18,'#f9ead0')+p(33,24,16,18,'#f9ead0')+p(21,28,7,11,'#332d39')+p(37,28,7,11,'#332d39')+p(22,29,2,3,'#fff')+p(38,29,2,3,'#fff');
-   z+=p(29,38,7,8,'#e9a952')+p(31,41,3,4,'#f4ca77');
+   z+=p(18,23,8,3,'#8e674f')+p(37,23,8,3,'#8e674f')+p(29,38,7,8,'#e9a952')+p(31,41,3,4,'#f4ca77')+p(8,10,5,8,'#674c41')+p(51,10,5,8,'#674c41');
  }else if(kind==='fox'){
    z+=p(6,7,18,20,'#b8693e')+p(40,7,18,20,'#b8693e')+p(12,11,12,18,'#ffcfb1')+p(40,11,12,18,'#ffcfb1')+p(11,22,42,32,'#cd7b42')+p(17,36,30,19,'#fff1e0');
    z+=p(19,29,6,8,E)+p(39,29,6,8,E)+p(30,39,6,4,E);
@@ -1130,7 +1130,15 @@ function face(kind){
  }else if(kind==='bear'){
    z+=p(9,11,17,18,'#92654d')+p(39,11,17,18,'#92654d')+p(11,20,42,35,'#ab7b5b')+p(18,33,6,7,E)+p(40,33,6,7,E)+p(23,41,20,11,'#e8cbb0')+p(30,43,6,4,E);
  }else if(kind==='squirrel'){
-   z+=p(7,20,15,28,'#98693b')+p(14,16,38,38,'#bc8349')+p(15,8,15,19,'#bc8349')+p(36,8,15,19,'#bc8349')+p(22,31,6,7,E)+p(39,31,6,7,E)+p(29,42,7,5,'#d3ad8e');
+   // Pointed ears, pale cheeks and the enormous curved tail make it recognizably a squirrel.
+   z+=p(2,25,16,26,'#85542f')+p(5,17,12,27,'#a96632')+p(7,14,10,17,'#d58d46')+p(9,38,13,16,'#915a31');
+   z+=p(14,13,38,41,'#bb7c44')+p(13,4,15,23,'#a96835')+p(38,4,14,23,'#a96835');
+   z+=p(17,8,7,12,'#efc498')+p(41,8,7,12,'#efc498')+p(18,34,28,18,'#f4d4a6');
+   z+=p(22,29,6,8,E)+p(39,29,6,8,E)+p(23,30,2,2,'#fff')+p(40,30,2,2,'#fff');
+   z+=p(30,40,6,5,'#68463f')+p(26,45,14,3,'#ad7562')+p(19,41,8,4,'#f5bfa8')+p(40,41,8,4,'#f5bfa8');
+ }else if(kind==='wolf'){
+   z+=p(5,7,17,26,'#687181')+p(42,7,17,26,'#687181')+p(10,15,11,16,'#b4bfcc')+p(43,15,11,16,'#b4bfcc')+p(9,23,46,29,'#8893a2')+p(18,38,28,16,'#f3e8e5');
+   z+=p(19,30,7,8,E)+p(40,30,7,8,E)+p(30,41,7,5,E);
  }else if(kind==='hamster'){
    z+=p(8,10,19,22,'#b98862')+p(38,10,19,22,'#b98862')+p(13,21,38,34,'#f2cd9d')+p(19,33,5,7,E)+p(40,33,5,7,E)+p(31,42,4,4,'#b78186');
  }else if(kind==='turtle'){
@@ -1142,19 +1150,31 @@ function face(kind){
  }
  return art(z,64);
 }
+// High-detail bakery sign in the map AND the teaching menu.
+function bakeryMark(){
+ let z='';
+ z+=p(7,24,50,33,'#795a4f')+p(10,27,44,29,'#efe2c2');
+ z+=p(5,19,54,10,'#ab6f70')+p(9,13,46,10,'#d6978c');
+ // A striped awning and unmistakable loaf-shaped bread sign.
+ for(let x=9;x<56;x+=12)z+=p(x,20,6,8,'#fff1d5');
+ z+=p(15,5,35,13,'#7a5a43')+p(17,7,31,10,'#f7d493');
+ z+=p(22,9,21,7,'#b7763c')+p(25,6,15,5,'#d89c55')+p(27,9,2,5,'#f6d590')+p(35,9,2,5,'#f6d590');
+ z+=p(13,32,16,16,'#96c2d0')+p(15,34,12,12,'#dfedf0')+p(31,32,14,25,'#8c674e')+p(33,34,10,23,'#b48a60')+p(38,45,2,3,'#f4d994');
+ return art(z,64);
+}
 function animalType(q){const n=q.name||'';
  if(/フクロウ|研究者|試験官/.test(n))return 'owl';
  if(/コトリ/.test(n))return 'bird';if(/ハリネズミ/.test(n))return 'hedgehog';if(/キツネ/.test(n))return 'fox';if(/ネズミ/.test(n))return 'mouse';
  if(/シカ/.test(n))return 'deer';if(/ネコ/.test(n))return 'cat';if(/くま|クマ/.test(n))return 'bear';
  if(/リス/.test(n))return 'squirrel';if(/ハムスター/.test(n))return 'hamster';if(/カメ/.test(n))return 'turtle';if(/チョウ/.test(n))return 'butterfly';
- if(/コウモリ/.test(n))return 'bat';if(/番人/.test(n))return 'fox';return 'rabbit';}
+ if(/コウモリ/.test(n))return 'bat';if(/番人/.test(n))return 'wolf';return 'rabbit';}
 const priorRender=window.render;
 window.render=function(){
  priorRender();const cells=$('map').children;
  for(let y=0;y<11;y++)for(let x=0;x<15;x++){
    let q=activeQ().find(v=>v.x===x&&v.y===y),cell=cells[y*15+x];if(!q||!cell||(x===s.x&&y===s.y))continue;
-   if(q.id===2||/図書館|パン屋/.test(q.name))continue;
-   cell.innerHTML=face(animalType(q));cell.title=q.name;
+   if(q.id===2||/図書館/.test(q.name))continue;
+   cell.innerHTML=/パン屋/.test(q.name)?bakeryMark():face(animalType(q));cell.title=q.name;
  }
 };
 window.render();
@@ -1225,6 +1245,29 @@ openTitle();
 // Convert leading emojis on secondary learning panels into matching small pixel symbols.
 function miniature(label){
  const word=String(label).replace(/^[^\p{L}\p{N}]+/u,'').trim();
+ // One recognisable portrait per resident. No generic yellow + for a resident's lesson.
+ if(/パン屋/.test(word))return bakeryMark();
+ if(/魔法図書館/.test(word))return bookArt();
+ if(/フクロウ|研究者|試験官/.test(word))return face('owl');
+ if(/コトリ/.test(word))return face('bird');
+ if(/ハリネズミ/.test(word))return face('hedgehog');
+ if(/見習いリス|リス/.test(word))return face('squirrel');
+ if(/キツネ/.test(word))return face('fox');
+ if(/くま|クマ/.test(word))return face('bear');
+ if(/ネズミ/.test(word))return face('mouse');
+ if(/ネコ/.test(word))return face('cat');
+ if(/シカ/.test(word))return face('deer');
+ if(/ハムスター/.test(word))return face('hamster');
+ if(/カメ/.test(word))return face('turtle');
+ if(/チョウ/.test(word))return face('butterfly');
+ if(/コウモリ/.test(word))return face('bat');
+ if(/洞窟の番人/.test(word))return face('wolf');
+ if(/第1章|契約のはじまり/.test(word))return chapterArt(1);
+ if(/第2章|意思表示の庭/.test(word))return chapterArt(2);
+ if(/第3章|真意を探す洞窟/.test(word))return chapterArt(3);
+ if(/第4章|守られし者の学び舎/.test(word))return chapterArt(4);
+ if(/第5章|代理の森/.test(word))return chapterArt(5);
+ if(/授業|ミニ講義|講義/.test(word))return bookArt();
  if(/辞典|万華鏡/.test(word))return art(p(10,9,44,42,'#806399')+p(14,12,36,34,'#e3d8ef')+p(20,20,24,4,'#7b639b')+p(20,29,18,4,'#7b639b'));
  if(/講義|学校/.test(word))return chapterArt(4);
  if(/ボス|戦/.test(word))return chapterArt(3);
@@ -1235,7 +1278,7 @@ function miniature(label){
  if(/クイズ|問題|道場|演習|挑戦/.test(word))return art(p(13,8,39,47,'#7c9f77')+p(19,14,27,35,'#f4e8cb')+p(23,23,17,3,'#687c5e')+p(23,32,12,3,'#687c5e'));
  if(/セーブ/.test(word))return art(p(14,9,37,44,'#6d6f80')+p(20,15,24,18,'#b5c9cb')+p(22,39,18,8,'#e8e1cf'));
  if(/戻る|探索/.test(word))return art(p(11,27,40,9,'#77966a')+p(11,21,15,21,'#77966a'));
- return art(p(27,6,9,51,'#d0b06d')+p(13,27,37,9,'#d0b06d')+p(19,16,25,30,'#f6dea1'));
+ return art(p(6,13,25,37,'#6a879d')+p(33,13,25,37,'#86a9b9')+p(9,17,20,29,'#f6eed9')+p(35,17,20,29,'#fff9eb')+p(30,13,4,40,'#536a79')+p(13,24,12,3,'#af9981')+p(13,31,11,3,'#af9981')+p(39,24,12,3,'#af9981')+p(39,31,11,3,'#af9981'));
 }
 const emoStart=/^\s*(?:[\p{Extended_Pictographic}\u2600-\u27BF][\uFE0E\uFE0F\u200D\p{Extended_Pictographic}]*)+\s*/u;
 function paintPanel(container){
