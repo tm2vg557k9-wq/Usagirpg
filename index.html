@@ -1839,3 +1839,125 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
 </style>
 <script>document.querySelector('.game-header>span').textContent='Ver.0.10.2';</script>
 </html>
+
+<style id="avatar-v0110-style">
+.avatar-open{background:linear-gradient(#fff0bd,#e9bdff)!important;border:2px solid #ad83cb!important;color:#51356e!important;font-weight:800!important;box-shadow:0 4px 0 #9671b4!important}
+#avatarCreator{position:fixed;inset:0;z-index:1000;background:#1c1235c9;display:grid;place-items:center;padding:12px;overflow:auto}
+#avatarCreator[hidden]{display:none!important}
+.avatar-shell{width:min(940px,100%);max-height:95dvh;overflow:auto;background:linear-gradient(160deg,#f9edff,#d7b9f1 65%,#c6a3e5);border:5px solid #76569d;border-radius:24px;box-shadow:0 8px 0 #47316d,0 18px 50px #180d36;color:#47305e;padding:18px;position:relative}
+.avatar-shell:before{content:'✦  ✧  ☾  ✦  ✧  ✦';display:block;text-align:center;color:#8a66b1;letter-spacing:12px;font-size:20px}
+.avatar-shell h2{text-align:center;margin:2px 0 4px;color:#654188;font-size:clamp(21px,4vw,31px)}
+.avatar-sub{text-align:center;font-size:13px;margin:0 0 14px;color:#73558c}
+.avatar-body{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(220px,.8fr);gap:14px}
+.avatar-options,.avatar-stage{border:3px solid #b390d5;background:#fff8ffde;border-radius:17px;padding:14px}
+.avatar-options h3{margin:10px 0 7px;font-size:15px;color:#644381}
+.avatar-choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.avatar-choices.style-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+.avatar-choices button{padding:8px 3px;min-width:0;background:#eee0f9;border:2px solid #c6a6df;border-radius:12px;font-size:12px;line-height:1.5;color:#60447c}
+.avatar-choices button .species-emoji{display:block;font-size:23px}
+.avatar-choices button[aria-pressed=true]{background:#ffefbb;border-color:#ac7fb8;box-shadow:inset 0 0 0 2px #fff,0 3px 0 #b18dc9}
+.avatar-shell input{border:2px solid #c7a3dc;border-radius:10px;background:white;margin:0;padding:9px}
+.avatar-stage{text-align:center;background:radial-gradient(circle at 30% 12%,#fff9d0 0 3px,transparent 4px),radial-gradient(circle at 80% 28%,#fff9d0 0 2px,transparent 3px),linear-gradient(#c6a3e7,#eee0fb 74%,#b9d2b0 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.avatar-stage .avatar-figure{width:min(200px,85%);aspect-ratio:1;display:grid;place-items:center;background:#ffffff30;border-radius:20px}
+.avatar-stage svg{width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 6px 0 #5b417644)}
+.avatar-stage .avatar-name{font-weight:800;font-size:19px;color:#4d3469}
+.avatar-stage .avatar-guide{background:#fff7ffde;border-radius:12px;padding:10px;font-size:13px;line-height:1.6;text-align:left}
+.avatar-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.avatar-actions button{padding:12px 18px!important;border-radius:15px!important;font-weight:800;background:#e4cff4;color:#523971;border:2px solid #aa86c8;min-height:46px}
+.avatar-actions .avatar-save{background:linear-gradient(#fff1bd,#f5ca88);border-color:#c59b63;color:#60446a}
+.avatar-current-tag{font-size:12px;color:#694b86;text-align:center;margin-top:8px}
+@media(max-width:620px){.avatar-body{grid-template-columns:1fr}.avatar-stage{min-height:210px}.avatar-stage .avatar-figure{width:115px}.avatar-shell{padding:10px}.avatar-options,.avatar-stage{padding:10px}.avatar-choices button{font-size:11px;padding:5px 2px}.avatar-choices button .species-emoji{font-size:19px}}
+</style>
+
+<script id="avatar-v0110-script">
+(()=>{
+ 'use strict';
+ const labels={rabbit:'うさぎ',human:'人間',fox:'きつね',bear:'くま',cat:'ねこ'};
+ const emojis={rabbit:'🐰',human:'🧑',fox:'🦊',bear:'🐻',cat:'🐱'};
+ const styles=['魔法使い','旅人','学者','守護者','料理人'];
+ const safeAvatar=a=>({species:labels[a?.species]?a.species:'rabbit',style:styles.includes(a?.style)?a.style:'旅人',name:String(a?.name||'').slice(0,16),tone:['ミルク','ラベンダー','キャラメル'].includes(a?.tone)?a.tone:'ミルク'});
+ s.avatar=safeAvatar(s.avatar);
+ const originalSprite=window.sprite;
+ const oldGrowth=window.growth;
+ function avatarSVG(facing='down',step=0,gear=''){
+  const a=s.avatar||safeAvatar();
+  if(a.species==='rabbit'&&a.style==='旅人'&&a.tone==='ミルク')return originalSprite('rabbit',facing,step,gear);
+  const P=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  const palettes={rabbit:['#fff7f1','#d9c6d4','#e9a5bb'],human:['#f7d4b4','#d6a782','#76503f'],fox:['#eaa064','#c97843','#fff1df'],bear:['#b98765','#8e5d4d','#e9c3a4'],cat:['#f1d5cb','#bca1ac','#e7a5bc']};
+  let [skin,shade,accent]=palettes[a.species];
+  if(a.tone==='ラベンダー'){skin=a.species==='human'?'#e7b8a7':'#d9c7ed';shade='#a98bc4';accent='#f3b8db'}
+  if(a.tone==='キャラメル'){skin=a.species==='human'?'#b67a54':'#d7a475';shade='#9b6b50';accent='#f5c5a0'}
+  const coat={魔法使い:'#8665b8',旅人:'#80a27f',学者:'#789ac3',守護者:'#bd86a0',料理人:'#eac7a5'}[a.style];
+  const walk=step%2===1?1:0,back=facing==='up',side=facing==='left'||facing==='right';
+  let v=P(5,29,23,2,'#755e86')+P(10,26+walk,5,4,'#55435c')+P(19,26-walk,5,4,'#55435c');
+  if(a.species==='fox'||a.species==='cat')v+=P(23,20,6,5,shade)+P(27,17,3,5,skin);
+  v+=P(7,18,20,10,'#574668')+P(8,18,18,9,coat)+P(11,20,12,2,'#ffffff55');
+  v+=P(5,20,4,7,skin)+P(25,20,4,7,skin);
+  if(a.species==='rabbit')v+=P(10,2,5,15,shade)+P(11,3,3,13,skin)+P(12,5,1,10,accent)+P(20,1,5,16,shade)+P(21,2,3,14,skin)+P(22,4,1,10,accent);
+  if(a.species==='fox'||a.species==='cat')v+=P(7,7,7,8,shade)+P(8,5,4,8,skin)+P(19,7,7,8,shade)+P(20,5,4,8,skin)+P(9,8,2,4,accent)+P(21,8,2,4,accent);
+  if(a.species==='bear')v+=P(7,8,7,7,shade)+P(8,9,5,5,skin)+P(20,8,7,7,shade)+P(21,9,5,5,skin);
+  if(a.species==='human')v+=P(8,8,18,13,shade)+P(9,9,16,12,accent)+P(10,11,14,9,skin)+P(9,8,17,5,shade);
+  else v+=P(8,13,18,12,shade)+P(9,13,16,11,skin);
+  if(!back){v+=P(12,18,2,3,'#3e3548')+P(21,18,2,3,'#3e3548')+P(16,22,3,2,a.species==='fox'?'#51384b':accent)+P(11,22,3,2,'#f2b8c1')+P(22,22,3,2,'#f2b8c1')}
+  if(side)v+=P(22,18,2,3,'#3e3548');
+  if(a.style==='魔法使い')v+=P(4,13,26,4,'#53416f')+P(9,6,16,9,'#72549c')+P(13,2,9,6,'#72549c')+P(12,12,12,2,'#efd49a')+P(18,8,3,3,'#f8e1a6');
+  if(a.style==='旅人')v+=P(18,22,8,7,'#805f4b')+P(19,22,6,6,'#b78b64')+P(21,23,3,2,'#f6d68e');
+  if(a.style==='学者')v+=P(6,15,23,3,'#6957a1')+P(9,12,17,4,'#7b66b0')+P(12,22,10,4,'#f6e9cd')+P(15,22,2,4,'#9d81bf');
+  if(a.style==='守護者')v+=P(6,18,5,7,'#d6d7e7')+P(23,18,5,7,'#d6d7e7')+P(14,20,6,6,'#d9c18b');
+  if(a.style==='料理人')v+=P(10,5,15,9,'#fff8ef')+P(8,9,19,5,'#fff8ef')+P(12,19,12,7,'#fff8ef');
+  if(gear==='星降るマント')v+=P(5,22,4,7,'#7753aa')+P(26,22,3,7,'#7753aa');
+  if(gear==='法律魔法の杖')v+=P(28,13,2,16,'#8e664b')+P(26,10,6,5,'#f6d47c');
+  if(gear==='大賢者の冠')v+=P(9,12,16,3,'#f3cf78')+P(13,9,7,4,'#f3cf78');
+  if(gear==='魔法のかばん')v+=P(23,23,6,6,'#805b48')+P(24,24,4,3,'#b78964');
+  if(gear==='賢者の帽子'&&a.style!=='魔法使い')v+=P(5,13,25,3,'#5c467a')+P(11,7,13,7,'#71559a');
+  if(gear==='冒険者のマフラー')v+=P(10,18,15,3,'#d87f9f')+P(22,20,3,8,'#d87f9f');
+  return `<svg class="pixel-sprite" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">${side&&facing==='left'?`<g transform="translate(32 0) scale(-1 1)">${v}</g>`:v}</svg>`;
+ }
+ window.sprite=function(kind,facing='down',step=0,gear=''){
+  return kind==='rabbit'?avatarSVG(facing,step,gear):originalSprite(kind,facing,step,gear);
+ };
+ // The title's original wizard rabbit remains the guide, Lumii, not the player's avatar.
+ const dialog=document.createElement('section');dialog.id='avatarCreator';dialog.hidden=true;
+ dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','冒険者キャラメイク');
+ dialog.innerHTML=`<div class="avatar-shell"><h2>🌙 冒険者をつくろう ✨</h2><p class="avatar-sub">ルミィと一緒に、法律の冒険へ出発しよう！</p><div class="avatar-body"><div class="avatar-options"><h3>① あなたの種族</h3><div id="avatarSpecies" class="avatar-choices"></div><h3>② 冒険スタイル</h3><div id="avatarStyles" class="avatar-choices style-choices"></div><h3>③ カラーバリエーション</h3><div id="avatarTones" class="avatar-choices style-choices"></div><h3>④ 冒険者の名前</h3><input id="avatarName" maxlength="16" placeholder="名前を入力（16文字まで）" aria-label="冒険者の名前"></div><div class="avatar-stage"><div class="avatar-figure" id="avatarFigure"></div><div class="avatar-name" id="avatarPreviewName"></div><div class="avatar-current-tag" id="avatarPreviewStyle"></div><div class="avatar-guide">🐰 ルミィ「ようこそ！ 私はこの村の案内役。あなたと一緒に法律の謎を解き明かすよ！」</div></div></div><div class="avatar-actions"><button type="button" id="avatarCancel">← もどる</button><button type="button" id="avatarSave" class="avatar-save">✨ この姿で冒険する！</button></div></div>`;
+ document.body.append(dialog);
+ let draft=safeAvatar(s.avatar),returnFocus=null;
+ const $a=id=>document.getElementById(id);
+ function choiceButtons(id,items,field){const root=$a(id);root.replaceChildren();for(const [value,label] of items){const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(draft[field]===value));b.onclick=()=>{draft[field]=value;update()};root.append(b)}}
+ function update(){
+  choiceButtons('avatarSpecies',Object.keys(labels).map(k=>[k,emojis[k]+' '+labels[k]]),'species');
+  choiceButtons('avatarStyles',styles.map((v,i)=>[v,['🪄','🎒','📚','🛡️','🥐'][i]+' '+v]),'style');
+  choiceButtons('avatarTones',['ミルク','ラベンダー','キャラメル'].map((v,i)=>[v,['🤍','💜','🍯'][i]+' '+v]),'tone');
+  const prev=s.avatar;s.avatar=draft;$a('avatarFigure').innerHTML=avatarSVG('down',0,s.equipped||'');s.avatar=prev;
+  $a('avatarPreviewName').textContent=draft.name||'名前をつけてね';
+  $a('avatarPreviewStyle').textContent=labels[draft.species]+' ／ '+draft.style;
+ }
+ $a('avatarName').addEventListener('input',e=>{draft.name=e.target.value.slice(0,16);update()});
+ function openCreator(){draft=safeAvatar(s.avatar);$a('avatarName').value=draft.name;returnFocus=document.activeElement;dialog.hidden=false;update();$a('avatarName').focus()}
+ function closeCreator(){dialog.hidden=true;returnFocus?.focus?.()}
+ $a('avatarCancel').onclick=closeCreator;
+ $a('avatarSave').onclick=()=>{draft.name=$a('avatarName').value.trim().slice(0,16)||'冒険者';s.avatar=safeAvatar(draft);save(false);render();closeCreator();if(chapter)home();else if(typeof window.showChapters==='function'&&!document.getElementById('chapters').hidden)window.showChapters()};
+ dialog.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closeCreator()}});
+ function addEntry(){
+  const start=document.getElementById('openingScreen');
+  if(start&&!start.querySelector('.avatar-open')){
+   const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 キャラクターをつくる';b.onclick=openCreator;
+   (start.querySelector('.start-cta')||start).append(b);
+  }
+  const chapterRoot=document.getElementById('chapters');
+  if(chapterRoot&&!chapterRoot.querySelector('.avatar-open')){
+   const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 キャラメイク';b.onclick=openCreator;chapterRoot.prepend(b);
+  }
+  const menu=document.getElementById('studyMenu');
+  if(menu&&!menu.querySelector('.avatar-open')){const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 キャラメイク';b.onclick=openCreator;menu.append(b)}
+ }
+ const oldChapters=window.showChapters;
+ window.showChapters=function(...args){const result=oldChapters.apply(this,args);addEntry();return result};
+ const oldHome=window.home;
+ window.home=function(...args){const result=oldHome.apply(this,args);if(chapter){const shortcuts=document.querySelector('#panel .home-shortcuts');if(shortcuts){const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 キャラメイク';b.onclick=openCreator;shortcuts.append(b)}}return result};
+ // Keep existing wardrobe, adding an avatar editor entry instead of replacing saved equipment.
+ window.growth=function(...args){const result=oldGrowth.apply(this,args);const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 種族・名前・冒険スタイルを変更';b.onclick=openCreator;document.getElementById('panel').append(b);return result};
+ addEntry();
+ const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.0';
+})();
+</script>
