@@ -1771,4 +1771,42 @@ observer.observe(panel,{subtree:true,childList:true,characterData:true});paintPa
 #panel a{display:inline-block;margin:9px 3px;color:#72529f}
 </style>
 <script>const verNew=document.querySelector('.game-header>span');if(verNew)verNew.textContent='Ver.0.10.0';</script>
+
+<style id="v0101-mobile-layout">
+/* Ver.0.10.1: title-only status removal; never remove the actual status data. */
+main:has(#openingScreen:not([hidden])) > .stats{display:none!important}
+/* On landscape iPads, put the study menu toggle in the unused upper-right corner. */
+@media (orientation:landscape) and (min-width:720px){
+ main:has(#adventure:not([hidden])){position:relative}
+ #adventure:not([hidden]) .study-side>.menu-toggle{position:absolute!important;right:12px;top:42px;z-index:12;width:auto!important;min-width:205px;max-width:38%;padding:8px 15px!important;min-height:43px!important;margin:0!important}
+ #adventure:not([hidden]) .study-side{padding-top:0!important}
+ #adventure:not([hidden]) .chapter-heading{padding-right:220px}
+}
+/* On iPhone SE and other iPhones, a single readable map size instead of tiny S/M/L. */
+body.iphone-map .map-size{display:none!important}
+body.iphone-map .map-topbar{min-height:0!important;margin:0 0 3px!important}
+body.iphone-map .map-topbar .map-guide-box{width:100%;align-items:flex-start;text-align:left}
+body.iphone-map .map-topbar .map-help,body.iphone-map .map-topbar #status{text-align:left!important}
+body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.iphone-map .map-side[data-size="medium"] #map,body.iphone-map .map-side[data-size="large"] #map{width:min(100%,370px)!important;max-width:370px!important;--map-limit:370px!important}
+@media (orientation:landscape) and (max-width:850px){
+ body.iphone-map #map,body.iphone-map .map-side[data-size] #map{width:min(100%,360px)!important;max-width:360px!important}
+ body.iphone-map .map-topbar .map-help{font-size:10px!important}
+}
+@media (orientation:portrait) and (max-width:430px){
+ body.iphone-map #map,body.iphone-map .map-side[data-size] #map{width:min(100%,370px)!important;max-width:370px!important}
+}
+</style>
+<script>
+(()=>{
+ 'use strict';
+ const version=document.querySelector('.game-header>span');if(version)version.textContent='Ver.0.10.1';
+ // iPhone only: preserve the user's iPad map size settings and all saved game progress.
+ if(/iPhone/i.test(navigator.userAgent)){
+  document.body.classList.add('iphone-map');
+  const selector=document.getElementById('mapSize');
+  const side=document.getElementById('mapSide');
+  if(selector&&side){side.dataset.size='medium';}
+ }
+})();
+</script>
 </html>
