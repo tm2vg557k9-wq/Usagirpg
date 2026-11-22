@@ -192,7 +192,7 @@ function record(tab='summary'){
  }btn('探索へ',home);
 }
 function recordNav(active){let root=$('panel'),nav=document.createElement('div');nav.className='record-nav';nav.setAttribute('aria-label','冒険の記録メニュー');[['summary','📊 総合記録'],['equipment','🎒 称号・装備'],['mastery','📚 法律習熟度'],['quest','📜 クエスト履歴']].forEach(([k,t])=>{let b=btn(t,()=>record(k),nav);b.setAttribute('aria-pressed',String(k===active))});root.insertBefore(nav,root.children[1]||null);root.scrollTop=0;}
-function home(){panel('🪽 ルミィ','森の住民を訪ねて法律語を学ぼう。辞典と羽ペンはいつでも使えるよ。');let a=activeQ(),n=a.filter(q=>s.cleared.includes(q.id)).length;let d=document.createElement('div');d.className='home-stats';let level=1+Math.floor(s.exp/60);d.innerHTML='<strong>🐰 Lv.'+level+'　'+titleNow()+'</strong><p>⭐ '+s.exp+' EXP　次のLvまで '+(60-s.exp%60)+' EXP</p><div class="home-bar"><span style="width:'+(s.exp%60/60*100)+'%"></span></div><p>📜 この章の進行 '+n+'/'+a.length+'</p><div class="home-bar"><span style="width:'+(a.length?n/a.length*100:0)+'%"></span></div>'; $('panel').append(d);btn('🏫 法律魔法学校',school);btn('🎒 称号・装備',growth);btn('📊 法律習熟度',mastery);btn('🥋 法律問題道場',dojo);btn('🪞 別表現問題',altPractice);btn('👑 HP付きボス戦',bossArena)}document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;let d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(d){e.preventDefault();move(...d)}});
+function home(){panel('🪽 ルミィ','森の住民を訪ねて法律語を学ぼう。辞典と羽ペンはいつでも使えるよ。');let a=activeQ(),n=a.filter(q=>s.cleared.includes(q.id)).length;let d=document.createElement('div');d.className='home-stats';let level=1+Math.floor(s.exp/60);d.innerHTML='<strong>🐰 Lv.'+level+'　'+titleNow()+'</strong><p>⭐ '+s.exp+' EXP　次のLvまで '+(60-s.exp%60)+' EXP</p><div class="home-bar"><span style="width:'+(s.exp%60/60*100)+'%"></span></div><p>📜 この章の進行 '+n+'/'+a.length+'</p><div class="home-bar"><span style="width:'+(a.length?n/a.length*100:0)+'%"></span></div>'; $('panel').append(d);let shortcuts=document.createElement('div');shortcuts.className='home-shortcuts';$('panel').append(shortcuts);btn('🏫 法律魔法学校',school,shortcuts);btn('🎒 称号・装備',growth,shortcuts);btn('📊 法律習熟度',mastery,shortcuts);btn('🥋 法律問題道場',dojo,shortcuts);btn('🪞 別表現問題',altPractice,shortcuts);btn('👑 HP付きボス戦',bossArena,shortcuts)}document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;let d={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(d){e.preventDefault();move(...d)}});
 s.study=s.study||{};s.boss=s.boss||false;
 const lessons={6:['代理とは、本人のために代理人が意思表示をする仕組み。','権限がないキツネが勝手に契約しても、くま本人は原則として拘束されない。本人の意思を守るためだよ。','本人が追認すれば原則として契約時にさかのぼる。ただし第三者の権利を害せない（116条）。'],8:['相手方は契約が有効か分からず困っている。','114条：相当の期間を定めて本人に確答を催告できる。相手方の善意・悪意は問わない。期間内に確答がなければ追認拒絶とみなす。','115条：契約時に代理権がないことを知らなかった相手方は、本人の追認前なら取消しができる。無過失までは不要。'],17:['善意とは事情を知らないこと。悪意とは知っていること。','無過失とは必要な注意を尽くしたこと。善意でも確認不足なら過失がある場合がある。','制度によって善意だけで足りる場合と無過失も必要な場合がある。条件を別々に読むこと。'],2:['本人が無権代理人を単独相続した場合、本人は追認を拒絶できる。','ただし無権代理人が117条の責任を負っていたなら、その責任を相続することがある。','逆に無権代理人が本人を単独相続した場合、追認拒絶などが先にないときは原則として追認拒絶できない。']};
 const R=[
@@ -1269,6 +1269,17 @@ function chapterArt(n){
  }else if(n===4){a+=p(8,22,49,35,'#e4d8b7')+p(4,17,56,8,'#846773')+p(12,8,40,12,'#ab8793')+p(23,36,18,21,'#917a58')+p(29,31,6,6,'#e4bd73')+p(12,30,9,9,'#a2c8d8')+p(43,30,9,9,'#a2c8d8');
  }else if(n===6){a+=p(4,47,56,11,'#b79cd2')+p(7,26,50,24,'#ecd9f3')+p(4,23,56,7,'#9f81c3')+p(10,12,44,12,'#bd9fdc')+p(26,32,12,18,'#8f6aa8')+p(42,33,10,10,'#a8d0dc')+p(13,34,10,9,'#a8d0dc')+p(44,8,11,11,'#f6df9d')+p(46,6,7,14,'#f6df9d');
  }else{a+=p(2,46,60,13,'#597c59')+p(10,25,11,28,'#4f6e50')+p(6,14,20,18,'#76a26a')+p(39,25,12,27,'#4f6e50')+p(35,12,23,19,'#76a26a')+p(28,13,8,40,'#bdad80')+p(26,7,12,15,'#d2c48e')+p(23,19,18,5,'#8d7051');}
+ // Little dreamy details: lanterns, stars, window lights and garden accents.
+ if(n===1||n===4||n===6){
+  a+=p(7,12,4,4,'#fff1a9')+p(8,10,2,8,'#fff1a9')+p(51,15,3,3,'#fff2bd');
+  a+=p(3,57,58,3,'#9cc48c')+p(8,53,3,4,'#f4c8e8')+p(50,53,3,4,'#f4c8e8');
+  a+=p(15,37,2,2,'#fff7d8')+p(46,37,2,2,'#fff7d8');
+ }
+ if(n===2||n===3||n===5){
+  a+=p(6,12,4,4,'#ffe7a8')+p(7,10,2,8,'#ffe7a8')+p(52,43,4,4,'#f9d5fa');
+  a+=p(44,7,3,3,'#fff3b7');
+ }
+ if(n===6){a+=p(42,8,8,8,'#fff4c4')+p(45,6,3,12,'#fff4c4')+p(14,35,7,5,'#e8f9ff')+p(43,35,7,5,'#e8f9ff');}
  return art(a,64);
 }
 
@@ -1809,4 +1820,22 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  }
 })();
 </script>
+<style id="v0102-layout">
+/* The main game is portrait-first on narrow phones; scrolling is intentional. */
+#panel .home-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0 4px}
+#panel .home-shortcuts button{width:100%;min-width:0;margin:0!important;min-height:54px;padding:10px 7px;line-height:1.35;white-space:normal;overflow-wrap:anywhere;text-align:center}
+@media(max-width:400px){#panel .home-shortcuts{gap:7px}#panel .home-shortcuts button{font-size:13px;padding:9px 5px}}
+/* Make chapter artwork more magical without altering its pixel geometry. */
+.chapter-choice-art{box-shadow:inset 0 0 0 3px #fff7,0 4px 0 #a98aca,0 7px 14px #51406733!important;background:radial-gradient(circle at 78% 18%,#fff4b7 0 2px,transparent 3px),radial-gradient(circle at 15% 65%,#fff9d5 0 2px,transparent 3px),linear-gradient(145deg,#e9d5f9,#bda7df)!important}
+.chapter-choice-art svg{filter:drop-shadow(0 2px 0 #684d8440)}
+/* Prevent the talk button turning into vertical text on compact landscape phones. */
+@media (orientation:landscape) and (max-width:850px){
+ body.iphone-map .map-actions{grid-template-columns:1fr!important;justify-items:center;gap:6px}
+ body.iphone-map .map-actions .controls{grid-column:1!important}
+ body.iphone-map .talk-slot{grid-column:1!important;width:min(100%,280px);padding:0!important}
+ body.iphone-map .talk-slot button{font-size:13px!important;min-height:40px!important;overflow-wrap:normal!important}
+ body.iphone-map .game-layout{gap:9px!important}
+}
+</style>
+<script>document.querySelector('.game-header>span').textContent='Ver.0.10.2';</script>
 </html>
