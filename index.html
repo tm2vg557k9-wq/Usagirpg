@@ -1878,7 +1878,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  'use strict';
  const labels={rabbit:'うさぎ',human:'人間',fox:'きつね',bear:'くま',cat:'ねこ'};
  const emojis={rabbit:'🐰',human:'🧑',fox:'🦊',bear:'🐻',cat:'🐱'};
- const styles=['魔法使い','旅人','学者','守護者','料理人'];
+ const styles=['魔法使い','旅人','学者','守護者'];
  const safeAvatar=a=>({species:labels[a?.species]?a.species:'rabbit',style:styles.includes(a?.style)?a.style:'旅人',name:String(a?.name||'').slice(0,16),tone:['ミルク','ラベンダー','キャラメル'].includes(a?.tone)?a.tone:'ミルク'});
  s.avatar=safeAvatar(s.avatar);
  const originalSprite=window.sprite;
@@ -1892,7 +1892,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   if(a.tone==='ラベンダー'){if(is!=='human'){skin='#d7c3ed';shade='#a38abe';accent='#f4c2e6'}else{skin='#dfb4a8';shade='#a17683';accent='#65446d'}}
   if(a.tone==='キャラメル'){if(is!=='human'){skin='#d9a56c';shade='#966849';accent='#f6d3a0'}else{skin='#b67b59';shade='#84533f';accent='#49343c'}}
   const ink='#57435f',eye='#352d42',white='#fff8f4',gold='#f4d28a';
-  const coat={魔法使い:'#8260ae',旅人:'#6d9b85',学者:'#7295b9',守護者:'#ab7899',料理人:'#e6bda7'}[a.style];
+  const coat={魔法使い:'#8260ae',旅人:'#6d9b85',学者:'#7295b9',守護者:'#ab7899'}[a.style];
   let behind='',body='',face='',accessory='',front='';
   const r=(x,y,w,h,c)=>P(x,y,w,h,c);
   // Each silhouette gets distinct ears, face and tail; hats never erase the ears.
@@ -1919,7 +1919,6 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   if(a.style==='旅人'){body+=r(38,43,13,13,'#795c4c')+r(40,44,10,11,'#b98b63')+r(43,47,5,3,gold)+r(18,43,5,11,'#d4b489')}
   if(a.style==='学者'){body+=r(17,44,13,10,'#f7e9ce')+r(18,45,5,7,'#d8c5a5')+r(24,45,5,7,'#fff8e9')+r(30,45,3,8,'#5e477d')}
   if(a.style==='守護者'){body+=r(11,40,10,8,'#d4d7e9')+r(43,40,10,8,'#d4d7e9')+r(26,43,12,10,gold)+r(28,45,8,6,'#886b9d')}
-  if(a.style==='料理人'){body+=r(22,41,22,15,white)+r(30,42,3,13,'#d8c5d5')+r(21,51,25,3,'#e3b8b4')}
   // Face: silhouette differs by species and remains visible under headwear.
   if(is==='human'){
    face+=r(15,24,34,21,ink)+r(17,25,30,19,skin)+r(14,19,36,9,shade)+r(18,17,29,9,shade)+r(18,26,8,5,shade)+r(37,26,9,4,shade);
@@ -1930,7 +1929,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   }else if(is==='cat'){
    face+=r(13,26,38,21,ink)+r(15,26,34,19,skin)+r(11,35,8,8,skin)+r(45,35,8,8,skin)+r(24,39,16,7,white);
   }else{
-   face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(11,33,7,9,shade)+r(46,33,7,9,shade);
+   face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(11,33,7,9,skin)+r(46,33,7,9,skin);
   }
   if(!back){
    face+=r(22,33,4,6,eye)+r(38,33,4,6,eye)+r(23,33,1,2,white)+r(39,33,1,2,white);
@@ -1944,13 +1943,13 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   if(a.style==='魔法使い'){
    accessory+=r(13,22,38,5,'#574271')+r(18,17,29,6,'#74549e')+r(25,10,18,8,'#74549e')+r(30,6,10,6,'#74549e')+r(19,22,27,2,gold)+r(35,13,4,4,gold);
   }else if(a.style==='旅人'){
-   accessory+=r(17,24,31,3,'#775b68')+r(21,21,23,4,'#c8a67e');
+   // No headband: the backpack and travel coat identify this style.
   }else if(a.style==='学者'){
-   accessory+=r(17,23,31,4,'#665486')+r(22,20,21,4,'#9279ad')+r(19,35,10,7,'#554761')+r(35,35,10,7,'#554761')+r(21,36,6,4,'#d8ecf3')+r(37,36,6,4,'#d8ecf3')+r(29,37,6,2,'#554761');
+   // Glasses only; no purple headband.
+   accessory+=r(19,35,10,7,'#554761')+r(35,35,10,7,'#554761')+r(21,36,6,4,'#d8ecf3')+r(37,36,6,4,'#d8ecf3')+r(29,37,6,2,'#554761');
   }else if(a.style==='守護者'){
-   accessory+=r(17,22,30,5,'#c9bfd8')+r(26,18,12,5,gold);
-  }else if(a.style==='料理人'){
-   accessory+=r(17,19,31,7,white)+r(20,12,10,9,white)+r(30,10,10,11,white)+r(40,13,8,9,white)+r(21,24,26,3,'#d6c8d9');
+   // A small chest emblem replaces the old forehead band.
+   body+=r(28,45,8,6,gold)+r(30,46,4,4,'#886b9d');
   }
   // Long ears sit above hats; shorter ears remain visible at the sides.
   if(is==='rabbit')front+=r(17,3,8,23,skin)+r(19,8,4,15,accent)+r(39,3,8,23,skin)+r(41,8,4,15,accent);
@@ -1979,7 +1978,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  function choiceButtons(id,items,field){const root=$a(id);root.replaceChildren();for(const [value,label] of items){const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(draft[field]===value));b.onclick=()=>{draft[field]=value;update()};root.append(b)}}
  function update(){
   choiceButtons('avatarSpecies',Object.keys(labels).map(k=>[k,emojis[k]+' '+labels[k]]),'species');
-  choiceButtons('avatarStyles',styles.map((v,i)=>[v,['🪄','🎒','📚','🛡️','🥐'][i]+' '+v]),'style');
+  choiceButtons('avatarStyles',styles.map((v,i)=>[v,['🪄','🎒','📚','🛡️'][i]+' '+v]),'style');
   choiceButtons('avatarTones',['ミルク','ラベンダー','キャラメル'].map((v,i)=>[v,['🤍','💜','🍯'][i]+' '+v]),'tone');
   const prev=s.avatar;s.avatar=draft;$a('avatarFigure').innerHTML=avatarSVG('down',0,s.equipped||'');s.avatar=prev;
   $a('avatarPreviewName').textContent=draft.name||'名前をつけてね';
@@ -2011,6 +2010,6 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  // Keep existing wardrobe, adding an avatar editor entry instead of replacing saved equipment.
  window.growth=function(...args){const result=oldGrowth.apply(this,args);const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 種族・名前・冒険スタイルを変更';b.onclick=openCreator;document.getElementById('panel').append(b);return result};
  addEntry();
- const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.1';
+ const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.2';
 })();
 </script>
