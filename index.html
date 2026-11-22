@@ -1871,15 +1871,18 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
 /* Larger preview on iPad, while preserving a compact phone layout. */
 @media(min-width:621px){.avatar-stage .avatar-figure{width:min(260px,95%)}.avatar-stage{min-height:355px}}
 @media(max-width:620px){.avatar-stage .avatar-figure{width:150px}}
+/* 0.11.3: a neutral backdrop and stronger sprite silhouette contrast */
+.avatar-stage .avatar-figure{background:linear-gradient(180deg,#fffaf4 0%,#f4eaf7 100%);border:2px solid #a47bbd;border-radius:22px;box-shadow:0 8px 0 #a57cba30, inset 0 0 0 4px #ffffff90}
+.avatar-stage .avatar-figure svg{filter:drop-shadow(0 3px 0 #59446555)}
 </style>
 
 <script id="avatar-v0111-script">
 (()=>{
  'use strict';
- const labels={rabbit:'うさぎ',human:'人間',fox:'きつね',bear:'くま',cat:'ねこ'};
- const emojis={rabbit:'🐰',human:'🧑',fox:'🦊',bear:'🐻',cat:'🐱'};
+ const labels={rabbit:'うさぎ',human:'人間',fox:'きつね',bear:'くま',mouse:'ねずみ'};
+ const emojis={rabbit:'🐰',human:'🧑',fox:'🦊',bear:'🐻',mouse:'🐭'};
  const styles=['魔法使い','旅人','学者','守護者'];
- const safeAvatar=a=>({species:labels[a?.species]?a.species:'rabbit',style:styles.includes(a?.style)?a.style:'旅人',name:String(a?.name||'').slice(0,16),tone:['ミルク','ラベンダー','キャラメル'].includes(a?.tone)?a.tone:'ミルク'});
+ const safeAvatar=a=>({species:labels[a?.species]?a.species:(a?.species==='cat'?'mouse':'rabbit'),style:styles.includes(a?.style)?a.style:'旅人',name:String(a?.name||'').slice(0,16),tone:['ミルク','夢かわピンク','ソーダブルー','キャラメル'].includes(a?.tone)?a.tone:(a?.tone==='ラベンダー'?'夢かわピンク':'ミルク')});
  s.avatar=safeAvatar(s.avatar);
  const originalSprite=window.sprite;
  const oldGrowth=window.growth;
@@ -1887,9 +1890,10 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   const a=s.avatar||safeAvatar();
   const P=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
   const is=a.species,back=facing==='up',side=facing==='left'||facing==='right',walk=step%2;
-  const base={rabbit:['#fff9f5','#d9c8d5','#f4b4c9'],human:['#f4d0b4','#bc866a','#744a4a'],fox:['#ee9b52','#bc643e','#fff4df'],bear:['#b98159','#81533f','#f4d1a8'],cat:['#f0d8d7','#ae94a7','#f4b7c7']}[is];
+  const base={rabbit:['#fff9f5','#d9c8d5','#f4b4c9'],human:['#f4d0b4','#bc866a','#744a4a'],fox:['#ee9b52','#bc643e','#fff4df'],bear:['#b98159','#81533f','#f4d1a8'],mouse:['#eee0d9','#b49ba7','#efb6c7']}[is];
   let [skin,shade,accent]=base;
-  if(a.tone==='ラベンダー'){if(is!=='human'){skin='#d7c3ed';shade='#a38abe';accent='#f4c2e6'}else{skin='#dfb4a8';shade='#a17683';accent='#65446d'}}
+  if(a.tone==='夢かわピンク'){if(is!=='human'){skin='#f7a8c8';shade='#c56c99';accent='#ffe0ed'}else{skin='#f3c2b5';shade='#a85c80';accent='#6b4266'}}
+  if(a.tone==='ソーダブルー'){if(is!=='human'){skin='#98def3';shade='#4c98bd';accent='#e4f9ff'}else{skin='#eac6af';shade='#5e9dbb';accent='#3c6488'}}
   if(a.tone==='キャラメル'){if(is!=='human'){skin='#d9a56c';shade='#966849';accent='#f6d3a0'}else{skin='#b67b59';shade='#84533f';accent='#49343c'}}
   const ink='#57435f',eye='#352d42',white='#fff8f4',gold='#f4d28a';
   const coat={魔法使い:'#8260ae',旅人:'#6d9b85',学者:'#7295b9',守護者:'#ab7899'}[a.style];
@@ -1899,9 +1903,9 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   behind+=r(11,58,43,3,'#6c547a55');
   if(is==='rabbit'){
    behind+=r(15,2,12,29,ink)+r(17,3,8,27,skin)+r(19,8,4,18,accent)+r(37,1,12,30,ink)+r(39,3,8,27,skin)+r(41,8,4,18,accent);
-  }else if(is==='cat'){
-   behind+=r(9,12,16,20,ink)+r(11,9,12,19,skin)+r(14,15,6,10,accent)+r(39,12,16,20,ink)+r(41,9,12,19,skin)+r(44,15,6,10,accent);
-   behind+=r(48,42,7,8,shade)+r(52,38,6,9,skin)+r(56,34,4,7,skin);
+  }else if(is==='mouse'){
+   behind+=r(7,14,20,17,ink)+r(10,10,15,20,ink)+r(12,12,12,16,skin)+r(14,15,8,10,accent)+r(37,14,20,17,ink)+r(39,10,15,20,ink)+r(40,12,12,16,skin)+r(42,15,8,10,accent);
+   behind+=r(51,47,8,4,shade)+r(56,42,5,8,skin)+r(58,37,4,7,skin)+r(54,34,6,4,shade);
   }else if(is==='fox'){
    behind+=r(7,14,18,19,ink)+r(11,8,12,24,skin)+r(14,16,6,10,accent)+r(39,14,18,19,ink)+r(41,8,12,24,skin)+r(44,16,6,10,accent);
    behind+=r(47,43,11,9,skin)+r(54,40,7,9,accent)+r(56,42,5,5,white);
@@ -1926,7 +1930,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
    face+=r(13,26,38,21,ink)+r(15,26,34,19,skin)+r(11,34,9,10,skin)+r(44,34,9,10,skin)+r(20,38,24,10,white)+r(27,38,10,8,white);
   }else if(is==='bear'){
    face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(21,36,22,12,accent)+r(26,39,12,8,'#f6dfc3');
-  }else if(is==='cat'){
+  }else if(is==='mouse'){
    face+=r(13,26,38,21,ink)+r(15,26,34,19,skin)+r(11,35,8,8,skin)+r(45,35,8,8,skin)+r(24,39,16,7,white);
   }else{
    face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(11,33,7,9,skin)+r(46,33,7,9,skin);
@@ -1937,7 +1941,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
    if(is==='rabbit'){face+=r(29,40,6,3,'#c781a3')+r(26,44,12,2,ink)+r(17,40,6,3,accent)+r(42,40,6,3,accent)}
    if(is==='bear'){face+=r(28,40,8,5,'#65433d')+r(31,44,3,2,ink)}
    if(is==='fox'){face+=r(28,40,8,4,'#5b3946')+r(17,39,5,3,white)+r(42,39,5,3,white)}
-   if(is==='cat'){face+=r(29,40,6,3,'#a66d8a')+r(27,44,4,2,ink)+r(34,44,4,2,ink)+r(11,39,10,1,ink)+r(43,39,10,1,ink)+r(12,43,9,1,ink)+r(43,43,9,1,ink)}
+   if(is==='mouse'){face+=r(29,40,6,3,'#d77e9c')+r(27,44,4,2,ink)+r(34,44,4,2,ink)+r(11,39,10,1,ink)+r(43,39,10,1,ink)+r(12,43,9,1,ink)+r(43,43,9,1,ink)}
   }
   // Headgear: behind/above forehead, not a large solid block covering the face.
   if(a.style==='魔法使い'){
@@ -1953,7 +1957,8 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
   }
   // Long ears sit above hats; shorter ears remain visible at the sides.
   if(is==='rabbit')front+=r(17,3,8,23,skin)+r(19,8,4,15,accent)+r(39,3,8,23,skin)+r(41,8,4,15,accent);
-  if(is==='cat'||is==='fox')front+=r(12,12,10,13,skin)+r(15,16,4,7,accent)+r(42,12,10,13,skin)+r(45,16,4,7,accent);
+  if(is==='fox')front+=r(12,12,10,13,skin)+r(15,16,4,7,accent)+r(42,12,10,13,skin)+r(45,16,4,7,accent);
+  if(is==='mouse')front+=r(12,13,12,12,skin)+r(14,16,8,7,accent)+r(40,13,12,12,skin)+r(42,16,8,7,accent);
   if(is==='bear')front+=r(10,17,13,10,skin)+r(14,19,6,5,shade)+r(41,17,13,10,skin)+r(44,19,6,5,shade);
   // Saved equipment remains independent of the new class outfit.
   if(gear==='星降るマント')front+=r(10,45,5,12,'#7653a8')+r(50,45,5,12,'#7653a8')+r(11,53,4,2,gold);
@@ -1979,7 +1984,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  function update(){
   choiceButtons('avatarSpecies',Object.keys(labels).map(k=>[k,emojis[k]+' '+labels[k]]),'species');
   choiceButtons('avatarStyles',styles.map((v,i)=>[v,['🪄','🎒','📚','🛡️'][i]+' '+v]),'style');
-  choiceButtons('avatarTones',['ミルク','ラベンダー','キャラメル'].map((v,i)=>[v,['🤍','💜','🍯'][i]+' '+v]),'tone');
+  choiceButtons('avatarTones',['ミルク','夢かわピンク','ソーダブルー','キャラメル'].map((v,i)=>[v,['🤍','🩷','🩵','🍯'][i]+' '+v]),'tone');
   const prev=s.avatar;s.avatar=draft;$a('avatarFigure').innerHTML=avatarSVG('down',0,s.equipped||'');s.avatar=prev;
   $a('avatarPreviewName').textContent=draft.name||'名前をつけてね';
   $a('avatarPreviewStyle').textContent=labels[draft.species]+' ／ '+draft.style;
@@ -2010,6 +2015,6 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  // Keep existing wardrobe, adding an avatar editor entry instead of replacing saved equipment.
  window.growth=function(...args){const result=oldGrowth.apply(this,args);const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 種族・名前・冒険スタイルを変更';b.onclick=openCreator;document.getElementById('panel').append(b);return result};
  addEntry();
- const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.2';
+ const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.3';
 })();
 </script>
