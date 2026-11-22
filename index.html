@@ -1840,7 +1840,7 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
 <script>document.querySelector('.game-header>span').textContent='Ver.0.10.2';</script>
 </html>
 
-<style id="avatar-v0110-style">
+<style id="avatar-v0111-style">
 .avatar-open{background:linear-gradient(#fff0bd,#e9bdff)!important;border:2px solid #ad83cb!important;color:#51356e!important;font-weight:800!important;box-shadow:0 4px 0 #9671b4!important}
 #avatarCreator{position:fixed;inset:0;z-index:1000;background:#1c1235c9;display:grid;place-items:center;padding:12px;overflow:auto}
 #avatarCreator[hidden]{display:none!important}
@@ -1867,9 +1867,13 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
 .avatar-actions .avatar-save{background:linear-gradient(#fff1bd,#f5ca88);border-color:#c59b63;color:#60446a}
 .avatar-current-tag{font-size:12px;color:#694b86;text-align:center;margin-top:8px}
 @media(max-width:620px){.avatar-body{grid-template-columns:1fr}.avatar-stage{min-height:210px}.avatar-stage .avatar-figure{width:115px}.avatar-shell{padding:10px}.avatar-options,.avatar-stage{padding:10px}.avatar-choices button{font-size:11px;padding:5px 2px}.avatar-choices button .species-emoji{font-size:19px}}
+
+/* Larger preview on iPad, while preserving a compact phone layout. */
+@media(min-width:621px){.avatar-stage .avatar-figure{width:min(260px,95%)}.avatar-stage{min-height:355px}}
+@media(max-width:620px){.avatar-stage .avatar-figure{width:150px}}
 </style>
 
-<script id="avatar-v0110-script">
+<script id="avatar-v0111-script">
 (()=>{
  'use strict';
  const labels={rabbit:'うさぎ',human:'人間',fox:'きつね',bear:'くま',cat:'ねこ'};
@@ -1881,37 +1885,86 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  const oldGrowth=window.growth;
  function avatarSVG(facing='down',step=0,gear=''){
   const a=s.avatar||safeAvatar();
-  if(a.species==='rabbit'&&a.style==='旅人'&&a.tone==='ミルク')return originalSprite('rabbit',facing,step,gear);
   const P=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
-  const palettes={rabbit:['#fff7f1','#d9c6d4','#e9a5bb'],human:['#f7d4b4','#d6a782','#76503f'],fox:['#eaa064','#c97843','#fff1df'],bear:['#b98765','#8e5d4d','#e9c3a4'],cat:['#f1d5cb','#bca1ac','#e7a5bc']};
-  let [skin,shade,accent]=palettes[a.species];
-  if(a.tone==='ラベンダー'){skin=a.species==='human'?'#e7b8a7':'#d9c7ed';shade='#a98bc4';accent='#f3b8db'}
-  if(a.tone==='キャラメル'){skin=a.species==='human'?'#b67a54':'#d7a475';shade='#9b6b50';accent='#f5c5a0'}
-  const coat={魔法使い:'#8665b8',旅人:'#80a27f',学者:'#789ac3',守護者:'#bd86a0',料理人:'#eac7a5'}[a.style];
-  const walk=step%2===1?1:0,back=facing==='up',side=facing==='left'||facing==='right';
-  let v=P(5,29,23,2,'#755e86')+P(10,26+walk,5,4,'#55435c')+P(19,26-walk,5,4,'#55435c');
-  if(a.species==='fox'||a.species==='cat')v+=P(23,20,6,5,shade)+P(27,17,3,5,skin);
-  v+=P(7,18,20,10,'#574668')+P(8,18,18,9,coat)+P(11,20,12,2,'#ffffff55');
-  v+=P(5,20,4,7,skin)+P(25,20,4,7,skin);
-  if(a.species==='rabbit')v+=P(10,2,5,15,shade)+P(11,3,3,13,skin)+P(12,5,1,10,accent)+P(20,1,5,16,shade)+P(21,2,3,14,skin)+P(22,4,1,10,accent);
-  if(a.species==='fox'||a.species==='cat')v+=P(7,7,7,8,shade)+P(8,5,4,8,skin)+P(19,7,7,8,shade)+P(20,5,4,8,skin)+P(9,8,2,4,accent)+P(21,8,2,4,accent);
-  if(a.species==='bear')v+=P(7,8,7,7,shade)+P(8,9,5,5,skin)+P(20,8,7,7,shade)+P(21,9,5,5,skin);
-  if(a.species==='human')v+=P(8,8,18,13,shade)+P(9,9,16,12,accent)+P(10,11,14,9,skin)+P(9,8,17,5,shade);
-  else v+=P(8,13,18,12,shade)+P(9,13,16,11,skin);
-  if(!back){v+=P(12,18,2,3,'#3e3548')+P(21,18,2,3,'#3e3548')+P(16,22,3,2,a.species==='fox'?'#51384b':accent)+P(11,22,3,2,'#f2b8c1')+P(22,22,3,2,'#f2b8c1')}
-  if(side)v+=P(22,18,2,3,'#3e3548');
-  if(a.style==='魔法使い')v+=P(4,13,26,4,'#53416f')+P(9,6,16,9,'#72549c')+P(13,2,9,6,'#72549c')+P(12,12,12,2,'#efd49a')+P(18,8,3,3,'#f8e1a6');
-  if(a.style==='旅人')v+=P(18,22,8,7,'#805f4b')+P(19,22,6,6,'#b78b64')+P(21,23,3,2,'#f6d68e');
-  if(a.style==='学者')v+=P(6,15,23,3,'#6957a1')+P(9,12,17,4,'#7b66b0')+P(12,22,10,4,'#f6e9cd')+P(15,22,2,4,'#9d81bf');
-  if(a.style==='守護者')v+=P(6,18,5,7,'#d6d7e7')+P(23,18,5,7,'#d6d7e7')+P(14,20,6,6,'#d9c18b');
-  if(a.style==='料理人')v+=P(10,5,15,9,'#fff8ef')+P(8,9,19,5,'#fff8ef')+P(12,19,12,7,'#fff8ef');
-  if(gear==='星降るマント')v+=P(5,22,4,7,'#7753aa')+P(26,22,3,7,'#7753aa');
-  if(gear==='法律魔法の杖')v+=P(28,13,2,16,'#8e664b')+P(26,10,6,5,'#f6d47c');
-  if(gear==='大賢者の冠')v+=P(9,12,16,3,'#f3cf78')+P(13,9,7,4,'#f3cf78');
-  if(gear==='魔法のかばん')v+=P(23,23,6,6,'#805b48')+P(24,24,4,3,'#b78964');
-  if(gear==='賢者の帽子'&&a.style!=='魔法使い')v+=P(5,13,25,3,'#5c467a')+P(11,7,13,7,'#71559a');
-  if(gear==='冒険者のマフラー')v+=P(10,18,15,3,'#d87f9f')+P(22,20,3,8,'#d87f9f');
-  return `<svg class="pixel-sprite" viewBox="0 0 32 32" shape-rendering="crispEdges" aria-hidden="true">${side&&facing==='left'?`<g transform="translate(32 0) scale(-1 1)">${v}</g>`:v}</svg>`;
+  const is=a.species,back=facing==='up',side=facing==='left'||facing==='right',walk=step%2;
+  const base={rabbit:['#fff9f5','#d9c8d5','#f4b4c9'],human:['#f4d0b4','#bc866a','#744a4a'],fox:['#ee9b52','#bc643e','#fff4df'],bear:['#b98159','#81533f','#f4d1a8'],cat:['#f0d8d7','#ae94a7','#f4b7c7']}[is];
+  let [skin,shade,accent]=base;
+  if(a.tone==='ラベンダー'){if(is!=='human'){skin='#d7c3ed';shade='#a38abe';accent='#f4c2e6'}else{skin='#dfb4a8';shade='#a17683';accent='#65446d'}}
+  if(a.tone==='キャラメル'){if(is!=='human'){skin='#d9a56c';shade='#966849';accent='#f6d3a0'}else{skin='#b67b59';shade='#84533f';accent='#49343c'}}
+  const ink='#57435f',eye='#352d42',white='#fff8f4',gold='#f4d28a';
+  const coat={魔法使い:'#8260ae',旅人:'#6d9b85',学者:'#7295b9',守護者:'#ab7899',料理人:'#e6bda7'}[a.style];
+  let behind='',body='',face='',accessory='',front='';
+  const r=(x,y,w,h,c)=>P(x,y,w,h,c);
+  // Each silhouette gets distinct ears, face and tail; hats never erase the ears.
+  behind+=r(11,58,43,3,'#6c547a55');
+  if(is==='rabbit'){
+   behind+=r(15,2,12,29,ink)+r(17,3,8,27,skin)+r(19,8,4,18,accent)+r(37,1,12,30,ink)+r(39,3,8,27,skin)+r(41,8,4,18,accent);
+  }else if(is==='cat'){
+   behind+=r(9,12,16,20,ink)+r(11,9,12,19,skin)+r(14,15,6,10,accent)+r(39,12,16,20,ink)+r(41,9,12,19,skin)+r(44,15,6,10,accent);
+   behind+=r(48,42,7,8,shade)+r(52,38,6,9,skin)+r(56,34,4,7,skin);
+  }else if(is==='fox'){
+   behind+=r(7,14,18,19,ink)+r(11,8,12,24,skin)+r(14,16,6,10,accent)+r(39,14,18,19,ink)+r(41,8,12,24,skin)+r(44,16,6,10,accent);
+   behind+=r(47,43,11,9,skin)+r(54,40,7,9,accent)+r(56,42,5,5,white);
+  }else if(is==='bear'){
+   behind+=r(8,15,17,17,ink)+r(10,17,13,13,skin)+r(14,20,6,7,shade)+r(39,15,17,17,ink)+r(41,17,13,13,skin)+r(44,20,6,7,shade);
+  }else{
+   // Human hair is a recognisable silhouette, with visible bangs and side locks.
+   behind+=r(12,14,40,33,shade)+r(9,23,8,23,shade)+r(47,23,8,23,shade);
+  }
+  // Shoes and clothing, drawn below the face.
+  body+=r(18,53+walk,12,6,ink)+r(19,53+walk,10,5,'#66546e')+r(35,54-walk,12,5,ink)+r(36,54-walk,10,4,'#66546e');
+  body+=r(13,39,39,17,ink)+r(15,40,35,15,coat)+r(18,42,29,3,'#ffffff45');
+  body+=r(9,41,7,12,ink)+r(10,42,6,10,skin)+r(49,41,7,12,ink)+r(49,42,6,10,skin);
+  if(a.style==='魔法使い'){body+=r(14,49,36,5,'#634889')+r(21,49,3,3,gold)+r(40,48,3,3,gold)}
+  if(a.style==='旅人'){body+=r(38,43,13,13,'#795c4c')+r(40,44,10,11,'#b98b63')+r(43,47,5,3,gold)+r(18,43,5,11,'#d4b489')}
+  if(a.style==='学者'){body+=r(17,44,13,10,'#f7e9ce')+r(18,45,5,7,'#d8c5a5')+r(24,45,5,7,'#fff8e9')+r(30,45,3,8,'#5e477d')}
+  if(a.style==='守護者'){body+=r(11,40,10,8,'#d4d7e9')+r(43,40,10,8,'#d4d7e9')+r(26,43,12,10,gold)+r(28,45,8,6,'#886b9d')}
+  if(a.style==='料理人'){body+=r(22,41,22,15,white)+r(30,42,3,13,'#d8c5d5')+r(21,51,25,3,'#e3b8b4')}
+  // Face: silhouette differs by species and remains visible under headwear.
+  if(is==='human'){
+   face+=r(15,24,34,21,ink)+r(17,25,30,19,skin)+r(14,19,36,9,shade)+r(18,17,29,9,shade)+r(18,26,8,5,shade)+r(37,26,9,4,shade);
+  }else if(is==='fox'){
+   face+=r(13,26,38,21,ink)+r(15,26,34,19,skin)+r(11,34,9,10,skin)+r(44,34,9,10,skin)+r(20,38,24,10,white)+r(27,38,10,8,white);
+  }else if(is==='bear'){
+   face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(21,36,22,12,accent)+r(26,39,12,8,'#f6dfc3');
+  }else if(is==='cat'){
+   face+=r(13,26,38,21,ink)+r(15,26,34,19,skin)+r(11,35,8,8,skin)+r(45,35,8,8,skin)+r(24,39,16,7,white);
+  }else{
+   face+=r(13,25,38,23,ink)+r(15,26,34,20,skin)+r(11,33,7,9,shade)+r(46,33,7,9,shade);
+  }
+  if(!back){
+   face+=r(22,33,4,6,eye)+r(38,33,4,6,eye)+r(23,33,1,2,white)+r(39,33,1,2,white);
+   if(is==='human'){face+=r(29,40,6,2,'#a66b70')+r(20,41,5,2,'#e7a8a9')+r(40,41,5,2,'#e7a8a9')}
+   if(is==='rabbit'){face+=r(29,40,6,3,'#c781a3')+r(26,44,12,2,ink)+r(17,40,6,3,accent)+r(42,40,6,3,accent)}
+   if(is==='bear'){face+=r(28,40,8,5,'#65433d')+r(31,44,3,2,ink)}
+   if(is==='fox'){face+=r(28,40,8,4,'#5b3946')+r(17,39,5,3,white)+r(42,39,5,3,white)}
+   if(is==='cat'){face+=r(29,40,6,3,'#a66d8a')+r(27,44,4,2,ink)+r(34,44,4,2,ink)+r(11,39,10,1,ink)+r(43,39,10,1,ink)+r(12,43,9,1,ink)+r(43,43,9,1,ink)}
+  }
+  // Headgear: behind/above forehead, not a large solid block covering the face.
+  if(a.style==='魔法使い'){
+   accessory+=r(13,22,38,5,'#574271')+r(18,17,29,6,'#74549e')+r(25,10,18,8,'#74549e')+r(30,6,10,6,'#74549e')+r(19,22,27,2,gold)+r(35,13,4,4,gold);
+  }else if(a.style==='旅人'){
+   accessory+=r(17,24,31,3,'#775b68')+r(21,21,23,4,'#c8a67e');
+  }else if(a.style==='学者'){
+   accessory+=r(17,23,31,4,'#665486')+r(22,20,21,4,'#9279ad')+r(19,35,10,7,'#554761')+r(35,35,10,7,'#554761')+r(21,36,6,4,'#d8ecf3')+r(37,36,6,4,'#d8ecf3')+r(29,37,6,2,'#554761');
+  }else if(a.style==='守護者'){
+   accessory+=r(17,22,30,5,'#c9bfd8')+r(26,18,12,5,gold);
+  }else if(a.style==='料理人'){
+   accessory+=r(17,19,31,7,white)+r(20,12,10,9,white)+r(30,10,10,11,white)+r(40,13,8,9,white)+r(21,24,26,3,'#d6c8d9');
+  }
+  // Long ears sit above hats; shorter ears remain visible at the sides.
+  if(is==='rabbit')front+=r(17,3,8,23,skin)+r(19,8,4,15,accent)+r(39,3,8,23,skin)+r(41,8,4,15,accent);
+  if(is==='cat'||is==='fox')front+=r(12,12,10,13,skin)+r(15,16,4,7,accent)+r(42,12,10,13,skin)+r(45,16,4,7,accent);
+  if(is==='bear')front+=r(10,17,13,10,skin)+r(14,19,6,5,shade)+r(41,17,13,10,skin)+r(44,19,6,5,shade);
+  // Saved equipment remains independent of the new class outfit.
+  if(gear==='星降るマント')front+=r(10,45,5,12,'#7653a8')+r(50,45,5,12,'#7653a8')+r(11,53,4,2,gold);
+  if(gear==='法律魔法の杖')front+=r(57,27,3,27,'#866047')+r(54,23,9,8,gold);
+  if(gear==='大賢者の冠')front+=r(22,24,21,3,gold)+r(27,20,10,5,gold);
+  if(gear==='魔法のかばん')front+=r(47,46,11,11,'#815c48')+r(49,47,8,7,'#bd8d66');
+  if(gear==='賢者の帽子'&&a.style!=='魔法使い')front+=r(17,23,30,3,'#5d467d')+r(22,19,20,5,'#74569b');
+  if(gear==='冒険者のマフラー')front+=r(19,39,27,4,'#d77f9f')+r(41,42,5,12,'#d77f9f');
+  const v=behind+body+face+accessory+front;
+  return `<svg class="pixel-sprite" viewBox="0 0 64 64" shape-rendering="crispEdges" aria-hidden="true">${side&&facing==='left'?`<g transform="translate(64 0) scale(-1 1)">${v}</g>`:v}</svg>`;
  }
  window.sprite=function(kind,facing='down',step=0,gear=''){
   return kind==='rabbit'?avatarSVG(facing,step,gear):originalSprite(kind,facing,step,gear);
@@ -1958,6 +2011,6 @@ body.iphone-map #map,body.iphone-map .map-side[data-size="small"] #map,body.ipho
  // Keep existing wardrobe, adding an avatar editor entry instead of replacing saved equipment.
  window.growth=function(...args){const result=oldGrowth.apply(this,args);const b=document.createElement('button');b.type='button';b.className='avatar-open';b.textContent='🎨 種族・名前・冒険スタイルを変更';b.onclick=openCreator;document.getElementById('panel').append(b);return result};
  addEntry();
- const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.0';
+ const v=document.querySelector('.game-header>span');if(v)v.textContent='Ver.0.11.1';
 })();
 </script>
